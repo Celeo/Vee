@@ -1,23 +1,14 @@
 /*
-Increase the width of the overlying conatiner div to 100% of its parent
-*/
-$('div#container').addClass('max-width');
-
-/*
-Increase the width of the comment divs to 100% of their parents
-*/
-$('div.md').addClass('max-width');
-
-/*
-Handle navigating submissions with clicking and the arrow keys.
+Handle navigating submissions by clicking
 */
 $('div.submission').on('click', function() {
     if (window.location.pathname == '/' && $('div.submission').index(this) == 0) {
         // clicked on the feature sub header on index page
         return false;
     }
-    $('div.submission').each(function() {
+    $('div.highlighted').each(function() {
         $(this).removeClass('highlighted');
+        console.log('click listener removed highlighting');
     });
     $(this).addClass('highlighted');
 });
