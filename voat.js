@@ -1,1 +1,2 @@
-document.getElementById('container').className = 'max-width';
+$('div#container').addClass('max-width');
+$('div.md').addClass('max-width');

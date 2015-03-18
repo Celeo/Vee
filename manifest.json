@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Voat Enhancement",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Voat enhancement",
     "content_scripts": [
         {
@@ -9,6 +9,7 @@
                 "https://voat.co/*"
             ],
             "js": [
+                "jquery.js",
                 "voat.js"
             ],
             "css": [
