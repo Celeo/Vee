@@ -46,7 +46,12 @@ $(document).keypress(function(e) {
             break;
         case 119:
             // w - open link
-            // TODO
+            $('div.highlighted').each(function(index) {
+                if ($(this).hasClass('highlighted')) {
+                    window.open($(this).find('a.title').first().attr('href'));
+                    return false;
+                }
+            });
             break;
         case 115:
             // s - save
@@ -54,20 +59,23 @@ $(document).keypress(function(e) {
             break;
         case 99:
             // c - open comments
-            // TODO
-            break;
-        case 101:
-            // e - vote up
-            $('div.submission').each(function(index) {
+            $('div.highlighted').each(function(index) {
                 if ($(this).hasClass('highlighted')) {
-                    if (index > (window.location.pathname == '/' ? 1 : 0)) {
-                        var arrow = $(this).parent().find('div.unvoted').find('div.arrow-upvote');
-                        if (arrow.length > 0)
-                            arrow.click();
-                        else
-                            $(this).parent().find('div.likes').find('div.arrow-upvoted').click();
-                        return false;
-                    }
+                    window.open($(this).find('a.comments').first().attr('href'));
+                    return false;
+                }
+            });
+            break;
+        case 114:
+            // r - open link and comments
+            $('div.highlighted').each(function(index) {
+                if ($(this).hasClass('highlighted')) {
+                    var link = $(this).find('a.title').first().attr('href');
+                    var comments = $(this).find('a.comments').first().attr('href');
+                    window.open(link);
+                    if (link !== comments)
+                        window.open(comments);
+                    return false;
                 }
             });
             break;

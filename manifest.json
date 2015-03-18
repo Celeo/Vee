@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Voat Enhancement",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "Voat enhancement",
     "content_scripts": [
         {
