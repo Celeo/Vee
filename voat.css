@@ -1,3 +1,7 @@
 .max-width {
     max-width: 100% !important;
 }
+
+.highlighted {
+    border: 1px solid orange;
+}
