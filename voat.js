@@ -27,7 +27,7 @@ $(document).keypress(function(e) {
             // q - move up
             $('div.submission').each(function(index) {
                 if ($(this).hasClass('highlighted')) {
-                    if (window.location.pathname !== '/' && index > 1) {
+                    if (index > (window.location.pathname == '/' ? 1 : 0)) {
                         $(this).removeClass('highlighted');
                         $('div.submission').eq(index - 1).addClass('highlighted');
                         return false;
@@ -52,23 +52,45 @@ $(document).keypress(function(e) {
             break;
         case 119:
             // w - open link
-
+            // TODO
             break;
         case 115:
             // s - save
-
+            // backburner
             break;
         case 99:
             // c - open comments
-
+            // TODO
             break;
         case 101:
             // e - vote up
-
+            $('div.submission').each(function(index) {
+                if ($(this).hasClass('highlighted')) {
+                    if (index > (window.location.pathname == '/' ? 1 : 0)) {
+                        var arrow = $(this).parent().find('div.unvoted').find('div.arrow-upvote');
+                        if (arrow.length > 0)
+                            arrow.click();
+                        else
+                            $(this).parent().find('div.likes').find('div.arrow-upvoted').click();
+                        return false;
+                    }
+                }
+            });
             break;
         case 100:
             // d - vote down
-
+            $('div.submission').each(function(index) {
+                if ($(this).hasClass('highlighted')) {
+                    if (index > (window.location.pathname == '/' ? 1 : 0)) {
+                        var arrow = $(this).parent().find('div.unvoted').find('div.arrow-downvote');
+                        if (arrow.length > 0)
+                            arrow.click();
+                        else
+                            $(this).parent().find('div.likes').find('div.arrow-downvotedd').click();
+                        return false;
+                    }
+                }
+            });
             break;
     }
 });
