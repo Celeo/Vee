@@ -1,12 +1,31 @@
 /*
+Returns the div elements to iterate through, based on the 
+current window's URL and the bool parameter.
+*/
+function getDivs(justHighlighted) {
+    if (typeof justHighlighted === 'undefined')
+        justHighlighted = false;
+    var ret;
+    if (window.location.pathname.indexOf('/comments/') > -1) {
+        console.log('1');
+        ret = justHighlighted ? $('div.highlighted') : $('div.entry:visible');
+    }
+    else
+        ret = justHighlighted ? $('div.highlighted') : $('div.submission');
+    console.log('returning ' + ret.length + ' matches');
+    return ret;
+}
+
+/*
 Handle navigating submissions by clicking
 */
-$('div.submission').on('click', function() {
-    if (window.location.pathname == '/' && $('div.submission').index(this) == 0) {
+$('div.submission,div.entry').on('click', function() {
+    if (window.location.pathname == '/' && getDivs().index(this) == 0) {
         // clicked on the feature sub header on index page
+        console.log('featured sub');
         return false;
     }
-    $('div.highlighted').each(function() {
+    getDivs(true).each(function() {
         $(this).removeClass('highlighted');
         console.log('click listener removed highlighting');
     });
@@ -20,11 +39,11 @@ $(document).keypress(function(e) {
     switch (e.keyCode) {
         case 113:
             // q - move up
-            $('div.submission').each(function(index) {
+            getDivs().each(function(index) {
                 if ($(this).hasClass('highlighted')) {
                     if (index > (window.location.pathname == '/' ? 1 : 0)) {
                         $(this).removeClass('highlighted');
-                        $('div.submission').eq(index - 1).addClass('highlighted');
+                        getDivs().eq(index - 1).addClass('highlighted');
                         return false;
                     }
                 }
@@ -33,20 +52,20 @@ $(document).keypress(function(e) {
         case 97:
             // a - move down
             var found = false;
-            $('div.submission').each(function(index) {
+            getDivs().each(function(index) {
                 if ($(this).hasClass('highlighted')) {
                     $(this).removeClass('highlighted');
                     found = true;
-                    $('div.submission').eq(index + 1).addClass('highlighted');
+                    getDivs().eq(index + 1).addClass('highlighted');
                     return false;
                 }
             });
             if (!found)
-                $('div.submission').eq(window.location.pathname == '/' ? 1 : 0).addClass('highlighted');
+                getDivs().eq(window.location.pathname == '/' ? 1 : 0).addClass('highlighted');
             break;
         case 119:
             // w - open link
-            $('div.highlighted').each(function(index) {
+            getDivs(true).each(function(index) {
                 if ($(this).hasClass('highlighted')) {
                     window.open($(this).find('a.title').first().attr('href'));
                     return false;
@@ -59,7 +78,7 @@ $(document).keypress(function(e) {
             break;
         case 99:
             // c - open comments
-            $('div.highlighted').each(function(index) {
+            getDivs(true).each(function(index) {
                 if ($(this).hasClass('highlighted')) {
                     window.open($(this).find('a.comments').first().attr('href'));
                     return false;
@@ -68,7 +87,7 @@ $(document).keypress(function(e) {
             break;
         case 114:
             // r - open link and comments
-            $('div.highlighted').each(function(index) {
+            getDivs(true).each(function(index) {
                 if ($(this).hasClass('highlighted')) {
                     var link = $(this).find('a.title').first().attr('href');
                     var comments = $(this).find('a.comments').first().attr('href');
@@ -81,8 +100,8 @@ $(document).keypress(function(e) {
             break;
         case 101:
             // e - vote up
-            $('div.highlighted').each(function() {
-                if ($('div.submission').index(this) > (window.location.pathname == '/' ? 1 : 0)) {
+            getDivs(true).each(function() {
+                if (getDivs().index(this) > (window.location.pathname == '/' ? 1 : 0)) {
                     var arrow = $(this).parent().find('div.unvoted').find('div.arrow-upvote');
                     if (arrow.length > 0)
                         arrow.click();
@@ -94,8 +113,8 @@ $(document).keypress(function(e) {
             break;
         case 100:
             // d - vote down
-            $('div.highlighted').each(function() {
-                if ($('div.submission').index(this) > (window.location.pathname == '/' ? 1 : 0)) {
+            getDivs(true).each(function() {
+                if (getDivs().index(this) > (window.location.pathname == '/' ? 1 : 0)) {
                     var arrow = $(this).parent().find('div.unvoted').find('div.arrow-downvote');
                     if (arrow.length > 0)
                         arrow.click();
