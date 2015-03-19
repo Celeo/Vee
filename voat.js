@@ -7,12 +7,10 @@ function getDivs(justHighlighted) {
         justHighlighted = false;
     var ret;
     if (window.location.pathname.indexOf('/comments/') > -1) {
-        console.log('1');
         ret = justHighlighted ? $('div.highlighted') : $('div.entry:visible');
     }
     else
         ret = justHighlighted ? $('div.highlighted') : $('div.submission');
-    console.log('returning ' + ret.length + ' matches');
     return ret;
 }
 
@@ -22,12 +20,10 @@ Handle navigating submissions by clicking
 $('div.submission,div.entry').on('click', function() {
     if (window.location.pathname == '/' && getDivs().index(this) == 0) {
         // clicked on the feature sub header on index page
-        console.log('featured sub');
         return false;
     }
     getDivs(true).each(function() {
         $(this).removeClass('highlighted');
-        console.log('click listener removed highlighting');
     });
     $(this).addClass('highlighted');
 });
