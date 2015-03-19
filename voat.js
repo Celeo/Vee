@@ -6,9 +6,8 @@ function getDivs(justHighlighted) {
     if (typeof justHighlighted === 'undefined')
         justHighlighted = false;
     var ret;
-    if (window.location.pathname.indexOf('/comments/') > -1) {
+    if (window.location.pathname.indexOf('/comments/') > -1)
         ret = justHighlighted ? $('div.highlighted') : $('div.entry:visible');
-    }
     else
         ret = justHighlighted ? $('div.highlighted') : $('div.submission');
     return ret;
@@ -18,10 +17,8 @@ function getDivs(justHighlighted) {
 Handle navigating submissions by clicking
 */
 $('div.submission,div.entry').on('click', function() {
-    if (window.location.pathname == '/' && getDivs().index(this) == 0) {
-        // clicked on the feature sub header on index page
+    if (window.location.pathname == '/' && getDivs().index(this) == 0)
         return false;
-    }
     getDivs(true).each(function() {
         $(this).removeClass('highlighted');
     });
@@ -62,7 +59,7 @@ $(document).keypress(function(e) {
         case 119:
             // w - open link
             getDivs(true).each(function(index) {
-                if ($(this).hasClass('highlighted')) {
+                if ($(this).find('a.title').length > 0) {
                     window.open($(this).find('a.title').first().attr('href'));
                     return false;
                 }
@@ -75,7 +72,7 @@ $(document).keypress(function(e) {
         case 99:
             // c - open comments
             getDivs(true).each(function(index) {
-                if ($(this).hasClass('highlighted')) {
+                if ($(this).find('a.comments').length > 0) {
                     window.open($(this).find('a.comments').first().attr('href'));
                     return false;
                 }
@@ -84,14 +81,14 @@ $(document).keypress(function(e) {
         case 114:
             // r - open link and comments
             getDivs(true).each(function(index) {
-                if ($(this).hasClass('highlighted')) {
+                if ($(this).find('a.title').length > 0) {
                     var link = $(this).find('a.title').first().attr('href');
                     var comments = $(this).find('a.comments').first().attr('href');
-                    window.open(link);
+                    window.open(comments);
                     if (link !== comments)
-                        window.open(comments);
-                    return false;
+                        window.open(link);
                 }
+                return false;
             });
             break;
         case 101:
