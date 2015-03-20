@@ -14,13 +14,32 @@ function getDivs(justHighlighted) {
 }
 
 /*
-Handle navigating submissions by clicking
+Removes highlighting from all divs
 */
-$('div.submission,div.entry').on('click', function() {
-    if (window.location.pathname == '/' && getDivs().index(this) == 0)
-        return false;
+function clearHighlighting() {
     getDivs(true).each(function() {
         $(this).removeClass('highlighted');
+    });
+}
+
+/*
+Handle navigating submissions by clicking
+*/
+$('div.submission').on('click', function() {
+    if (window.location.pathname == '/' && getDivs().index(this) == 0)
+        return false;
+    if (window.location.pathname.indexOf('/comments/') > -1)
+        return false;
+    getDivs(true).each(function() {
+        clearHighlighting();
+    });
+    $(this).addClass('highlighted');
+});
+$('div.entry').on('click', function() {
+    if (window.location.pathname == '/' && $('div.entry').index(this) == 0)
+        return false;
+    getDivs(true).each(function() {
+        clearHighlighting();
     });
     $(this).addClass('highlighted');
 });
@@ -35,7 +54,7 @@ $(document).keypress(function(e) {
             getDivs().each(function(index) {
                 if ($(this).hasClass('highlighted')) {
                     if (index > (window.location.pathname == '/' ? 1 : 0)) {
-                        $(this).removeClass('highlighted');
+                        clearHighlighting();
                         getDivs().eq(index - 1).addClass('highlighted');
                         return false;
                     }
@@ -47,7 +66,7 @@ $(document).keypress(function(e) {
             var found = false;
             getDivs().each(function(index) {
                 if ($(this).hasClass('highlighted')) {
-                    $(this).removeClass('highlighted');
+                    clearHighlighting();
                     found = true;
                     getDivs().eq(index + 1).addClass('highlighted');
                     return false;
@@ -94,27 +113,19 @@ $(document).keypress(function(e) {
         case 101:
             // e - vote up
             getDivs(true).each(function() {
-                if (getDivs().index(this) > (window.location.pathname == '/' ? 1 : 0)) {
                     var arrow = $(this).parent().find('div.unvoted').find('div.arrow-upvote');
                     if (arrow.length > 0)
-                        arrow.click();
-                    else
-                        $(this).parent().find('div.likes').find('div.arrow-upvoted').click();
+                        arrow.first().click();
                     return false;
-                }
             });
             break;
         case 100:
             // d - vote down
             getDivs(true).each(function() {
-                if (getDivs().index(this) > (window.location.pathname == '/' ? 1 : 0)) {
                     var arrow = $(this).parent().find('div.unvoted').find('div.arrow-downvote');
                     if (arrow.length > 0)
                         arrow.click();
-                    else
-                        $(this).parent().find('div.likes').find('div.arrow-downvotedd').click();
                     return false;
-                }
             });
             break;
     }
