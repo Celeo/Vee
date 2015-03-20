@@ -113,19 +113,27 @@ $(document).keypress(function(e) {
         case 101:
             // e - vote up
             getDivs(true).each(function() {
-                    var arrow = $(this).parent().find('div.unvoted').find('div.arrow-upvote');
-                    if (arrow.length > 0)
-                        arrow.first().click();
-                    return false;
+                var arrow = $(this).parent().find('div.unvoted').find('div[class^="arrow-upvote"]');
+                if (arrow.length > 0)
+                    arrow.click();
+                else {
+                    arrow = $(this).parent().find('div.midcol').find('div[class^="arrow-upvote"]');
+                    arrow.first().click();
+                }
+                return false;
             });
             break;
         case 100:
             // d - vote down
             getDivs(true).each(function() {
-                    var arrow = $(this).parent().find('div.unvoted').find('div.arrow-downvote');
-                    if (arrow.length > 0)
-                        arrow.click();
-                    return false;
+                var arrow = $(this).parent().find('div.unvoted').find('div[class^="arrow-downvote"]');
+                if (arrow.length > 0)
+                    arrow.click();
+                else {
+                    arrow = $(this).parent().find('div.midcol').find('div[class^="arrow-downvote"]');
+                    arrow.first().click();
+                }
+                return false;
             });
             break;
     }
