@@ -3,3 +3,4 @@
 * Save links
 * Save comments
 * Customize hotkeys
+* User tags

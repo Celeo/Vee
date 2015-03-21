@@ -49,7 +49,7 @@ Handle navigating submissions with the keyboard
 */
 $(document).keypress(function(e) {
     if (event.target.tagName !== "BODY")
-            return;
+        return;
     switch (e.keyCode) {
         case 113:
             // q - move up
