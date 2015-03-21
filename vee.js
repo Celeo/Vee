@@ -115,26 +115,24 @@ $(document).keypress(function(e) {
         case 101:
             // e - vote up
             getDivs(true).each(function() {
-                var arrow = $(this).parent().children('div.unvoted').children('div[class^="arrow-upvote"]');
-                if (arrow.length > 0)
-                    arrow.click();
-                else {
-                    arrow = $(this).parent().children('div.midcol').children('div[class^="arrow-upvote"]');
-                    arrow.first().click();
-                }
+                var arrow;
+                if (window.location.pathname.indexOf('/comments/') > -1)
+                    arrow = $(this).parent().children('div[class*="midcol"]').children('div[class*="arrow-upvote"]');
+                else
+                    arrow = $(this).children('div[class*="midcol"]').children('div[class*="arrow-upvote"]');
+                arrow.click();
                 return false;
             });
             break;
         case 100:
             // d - vote down
             getDivs(true).each(function() {
-                var arrow = $(this).parent().children('div.unvoted').children('div[class^="arrow-downvote"]');
-                if (arrow.length > 0)
-                    arrow.click();
-                else {
-                    arrow = $(this).parent().children('div.midcol').children('div[class^="arrow-downvote"]');
-                    arrow.first().click();
-                }
+                var arrow;
+                if (window.location.pathname.indexOf('/comments/') > -1)
+                    arrow = $(this).parent().children('div[class*="midcol"]').children('div[class*="arrow-downvote"]');
+                else
+                    arrow = $(this).children('div[class*="midcol"]').children('div[class*="arrow-downvote"]');
+                arrow.click();
                 return false;
             });
             break;
