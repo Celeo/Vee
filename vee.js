@@ -48,6 +48,8 @@ $('div.entry').on('click', function() {
 Handle navigating submissions with the keyboard
 */
 $(document).keypress(function(e) {
+    if (event.target.tagName !== "BODY")
+            return;
     switch (e.keyCode) {
         case 113:
             // q - move up
