@@ -9,3 +9,7 @@
 .highlighted {
     border: 1px solid orange;
 }
+
+a {
+    cursor: pointer;
+}
