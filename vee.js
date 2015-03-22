@@ -117,9 +117,9 @@ $(document).keypress(function(e) {
             getDivs(true).each(function() {
                 var arrow;
                 if (window.location.pathname.indexOf('/comments/') > -1)
-                    arrow = $(this).parent().children('div[class*="midcol"]').children('div[class*="arrow-upvote"]');
+                    arrow = $(this).parent().find('div[class*="arrow-upvote"]');
                 else
-                    arrow = $(this).children('div[class*="midcol"]').children('div[class*="arrow-upvote"]');
+                    arrow = $(this).find('div[class*="arrow-upvote"]');
                 arrow.click();
                 return false;
             });
@@ -129,9 +129,9 @@ $(document).keypress(function(e) {
             getDivs(true).each(function() {
                 var arrow;
                 if (window.location.pathname.indexOf('/comments/') > -1)
-                    arrow = $(this).parent().children('div[class*="midcol"]').children('div[class*="arrow-downvote"]');
+                    arrow = $(this).parent().find('div[class*="arrow-downvote"]');
                 else
-                    arrow = $(this).children('div[class*="midcol"]').children('div[class*="arrow-downvote"]');
+                    arrow = $(this).find('div[class*="arrow-downvote"]');
                 arrow.click();
                 return false;
             });
