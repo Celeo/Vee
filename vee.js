@@ -65,8 +65,16 @@ $(document).ready(function() {
             }
         });
     }
-    // TODO determine here if the link has already been saved, and set the text to 'unsave'
     $('ul.flat-list.buttons').append('<li><a class="vee-save" title="save with Vee">save</a></li>');
+    chrome.storage.local.get('saved', function(items) {
+        for (i = 0; i < items['saved'].length; i ++) {
+            $('a.vee-save').each(function() {
+                if ($(this).parent().parent().find('li').first().find('a').attr('href') == items['saved'][i]['link']) {
+                    $(this).text('unsave');
+                }
+            });
+        }
+    });
     $('.vee-save').on('click', function() {
         var linkObj = $(this);
         if ($(this).text() == 'save') {
