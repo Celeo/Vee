@@ -25,7 +25,7 @@ function clearHighlighting() {
 /*
 Load settings button on the homepage
 */
-var savedLoaded = false;
+var items = [];
 $(document).ready(function() {
     if (window.location.pathname == '/') {
         $('div.side>div.spacer').eq(7)
@@ -33,17 +33,18 @@ $(document).ready(function() {
             + 'class="btn-whoaverse btn-block contribute">Saved Links &amp; Comments</a></div>');
         $('#vee-saved').on('click', function() {
             if ($('a#vee-saved').text() == 'Saved Links & Comments') {
-                var saved = '<div id="vee-saved-items">';
-                chrome.storage.local.get('saved', function(items) {
+                var saved = '<div id="vee-saved-items"><h1>Saved items</h1>';
+                // TODO implement in Chrome storage
+                // chrome.storage.local.get('saved', function(items) {
                     if (items !== null && items !== undefined && items.length > 0) {
-                        for (i = 0; i < items.length(); i ++) {
+                        for (i = 0; i < items.length; i ++) {
                             saved += '<div class="submission link self">'
                                 + '<p class="parent"></p>'
-                                + '<span class="rank">' + i + '</span>'
                                 + '<p class="title">'
-                                + '<a class="title may-blank " href="LINK" tabindex="1" title="TITLE">TITLE</a>'
-                                + '</p>'
-                                + '<p class="tagline">' + item['text'] + '</p><div class="child"></div>'
+                                + '<a class="title may-blank " href="' + items[i]['link'] + '" tabindex="1" title="'
+                                + items[i]['title'] + '">' + items[i]['title'] + '</a>'
+                                + '<span class="domain">(<a href="' + items[i]['place'] + '">' + items[i]['place'] + '</a>)</span>'
+                                + '</p><p class="tagline">' + items[i]['info'] + '</p><div class="child"></div>'
                                 + '<div class="clearleft"><!--IE6fix--></div>';
                         }
                     }
@@ -52,9 +53,9 @@ $(document).ready(function() {
                             + 'title="nothing here">nothing here</a></p><p class="tagline"></p><div class="child"></div><div class="clearleft"><!--IE6fix--></div>';
                     }
                     saved += '</div>';
+                    $('div#vee-saved-items').remove();
                     $('div#container').append(saved);
-                    savedLoaded = true;
-                });
+                // });
                 $('div.sitetable').hide(100);
                 $('div#vee-saved-items').show();
                 $('a#vee-saved').text('Show main content');
@@ -68,27 +69,41 @@ $(document).ready(function() {
     }
     $('ul.flat-list.buttons').append('<li><a class="vee-save" title="save with Vee">save</a></li>');
     $('.vee-save').on('click', function() {
-        var link = $(this).parent().parent().find('li').first().find('a').attr('href');
-        var title = $(this).parent().parent().parent().find('a.title').text();
-        var place = $(this).parent().parent().parent().find('a').eq(1).text();
-        chrome.storage.local.get('saved', function(items) {
-            if (items !== null && items !== undefined) {
-                console.log('first item saving');
-                chrome.storage.local.set({'saved':
-                        [
-                            {link: link, title: title, place: place}
-                        ]
-                    }, function() {
-                    console.log('first item saved');
-                });
-            }
-            else {
-                console.log('item saving');
-                chrome.storage.local.set({'saved': saved.push({'link': link, 'title': title, 'place': place})}, function() {
-                    console.log('item saved');
-                });
-            }
-        });
+        if ($(this).text() == 'save') {
+            var link = $(this).parent().parent().find('li').first().find('a').attr('href');
+            var title = $(this).parent().parent().parent().find('a.title').text();
+            var place = $(this).parent().parent().parent().find('a').eq(1).text();
+            var now = new Date();
+            var info = 'saved at ' +
+                [[now.getMonth() + 1, now.getDate(), now.getFullYear()].join("/") + ',', [now.getHours(),
+                now.getMinutes()].join(':'), now.getHours() >= 12 ? 'PM' : 'AM'].join(' ');
+            // chrome.storage.local.get('saved', function(items) {
+                if (items == null || items == undefined) {
+                    items = [{link: link, title: title, place: place, info: info}];
+                    $(this).text('unsave');
+                    // TODO implement in Chrome storage
+                    // chrome.storage.local.set({'saved': [{link: link, title: title, place: place}]}, function() {
+                    //     console.log('first item saved');
+                    // });
+                }
+                else {
+                    items.push({link: link, title: title, place: place, info: info});
+                    $(this).text('unsave');
+                    // TODO implement in Chrome storage
+                    // chrome.storage.local.set({'saved': saved.push({'link': link, 'title': title, 'place': place})}, function() {
+                    //     console.log('item saved');
+                    // });
+                }
+            // });
+        }
+        else {
+            var link = $(this).parent().parent().find('li').first().find('a').attr('href');
+            for (i = 0; i < items.length; i ++)
+                if (items[i]['link'] == link)
+                    items.splice(i, 1);
+            // TODO implement in Chrome storage
+            $(this).text('save');
+        }
     });
 });
 
