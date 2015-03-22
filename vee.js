@@ -68,6 +68,14 @@ $(document).ready(function() {
             }
         });
     }
+    $('ul.flat-list.buttons').append('<li><a class="vee-save" title="save with Vee">save</a></li>');
+    $('.vee-save').on('click', function() {
+        var link = $(this).parent().parent().find('li').first().find('a').attr('href');
+        var title = $(this).parent().parent().parent().find('a.title').text();
+        var place = $(this).parent().parent().parent().find('a').eq(1).text();
+        // TODO save item
+
+    });
 });
 
 /*
