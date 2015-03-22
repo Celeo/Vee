@@ -23,6 +23,15 @@ function clearHighlighting() {
 }
 
 /*
+Load settings button on the homepage
+*/
+$(document).ready(function() {
+    if (window.location.pathname == '/') {
+        $('div.side>div.spacer').eq(7).after('<div class="spacer"><a href="/sets" class="btn-whoaverse btn-block">Saved Links &amp; Comments</a></div>');
+    }
+});
+
+/*
 Handle navigating submissions by clicking
 */
 $('div.submission').on('click', function() {

@@ -18,7 +18,7 @@
         }
     ],
     "permissions": [
-        "http://voat.co/*", "https://voat.co/*"
+        "storage", "http://voat.co/*", "https://voat.co/*"
     ],
     "icons": {
         "128": "icon_128.png",
