@@ -32,7 +32,7 @@ $(document).ready(function() {
             .after('<div class="spacer"><a id="vee-saved"'
             + 'class="btn-whoaverse btn-block contribute">Saved Links &amp; Comments</a></div>');
         $('#vee-saved').on('click', function() {
-            if (savedLoaded === false) {
+            if ($('a#vee-saved').text() == 'Saved Links & Comments') {
                 var saved = '<div id="vee-saved-items">';
                 chrome.storage.local.get('saved', function(items) {
                     if (items !== null && items !== undefined && items.length > 0) {
@@ -51,12 +51,10 @@ $(document).ready(function() {
                         saved += '<div class="submission link self"><p class="parent"></p><span class="rank"></span><p class="title"><a class="title may-blank " tabindex="1" '
                             + 'title="nothing here">nothing here</a></p><p class="tagline"></p><div class="child"></div><div class="clearleft"><!--IE6fix--></div>';
                     }
-                    saved += '</div>'
+                    saved += '</div>';
                     $('div#container').append(saved);
                     savedLoaded = true;
                 });
-            }
-            if ($('a#vee-saved').text() == 'Saved Links & Comments') {
                 $('div.sitetable').hide(100);
                 $('div#vee-saved-items').show();
                 $('a#vee-saved').text('Show main content');
@@ -73,8 +71,24 @@ $(document).ready(function() {
         var link = $(this).parent().parent().find('li').first().find('a').attr('href');
         var title = $(this).parent().parent().parent().find('a.title').text();
         var place = $(this).parent().parent().parent().find('a').eq(1).text();
-        // TODO save item
-
+        chrome.storage.local.get('saved', function(items) {
+            if (items !== null && items !== undefined) {
+                console.log('first item saving');
+                chrome.storage.local.set({'saved':
+                        [
+                            {link: link, title: title, place: place}
+                        ]
+                    }, function() {
+                    console.log('first item saved');
+                });
+            }
+            else {
+                console.log('item saving');
+                chrome.storage.local.set({'saved': saved.push({'link': link, 'title': title, 'place': place})}, function() {
+                    console.log('item saved');
+                });
+            }
+        });
     });
 });
 
