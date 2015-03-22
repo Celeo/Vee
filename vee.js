@@ -27,9 +27,9 @@ Handle navigating submissions by clicking
 */
 $('div.submission').on('click', function() {
     if (window.location.pathname == '/' && getDivs().index(this) == 0)
-        return false;
+        return true;
     if (window.location.pathname.indexOf('/comments/') > -1)
-        return false;
+        return true;
     getDivs(true).each(function() {
         clearHighlighting();
     });
@@ -37,7 +37,7 @@ $('div.submission').on('click', function() {
 });
 $('div.entry').on('click', function() {
     if (window.location.pathname == '/' && $('div.entry').index(this) == 0)
-        return false;
+        return true;
     getDivs(true).each(function() {
         clearHighlighting();
     });
