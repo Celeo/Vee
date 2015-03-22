@@ -23,9 +23,8 @@ function clearHighlighting() {
 }
 
 /*
-Load settings button on the homepage
+Load saved items button on the homepage and handle (un)saving items
 */
-var items = [];
 $(document).ready(function() {
     if (window.location.pathname == '/') {
         $('div.side>div.spacer').eq(7)
@@ -34,17 +33,16 @@ $(document).ready(function() {
         $('#vee-saved').on('click', function() {
             if ($('a#vee-saved').text() == 'Saved Links & Comments') {
                 var saved = '<div id="vee-saved-items"><h1>Saved items</h1>';
-                // TODO implement in Chrome storage
-                // chrome.storage.local.get('saved', function(items) {
-                    if (items !== null && items !== undefined && items.length > 0) {
-                        for (i = 0; i < items.length; i ++) {
+                chrome.storage.local.get('saved', function(items) {
+                    if (items !== null && items !== undefined && items['saved'] !== undefined && items['saved'].length > 0) {
+                        for (i = 0; i < items['saved'].length; i ++) {
                             saved += '<div class="submission link self">'
                                 + '<p class="parent"></p>'
                                 + '<p class="title">'
-                                + '<a class="title may-blank " href="' + items[i]['link'] + '" tabindex="1" title="'
-                                + items[i]['title'] + '">' + items[i]['title'] + '</a>'
-                                + '<span class="domain">(<a href="' + items[i]['place'] + '">' + items[i]['place'] + '</a>)</span>'
-                                + '</p><p class="tagline">' + items[i]['info'] + '</p><div class="child"></div>'
+                                + '<a class="title may-blank " href="' + items['saved'][i]['link'] + '" tabindex="1" title="'
+                                + items['saved'][i]['title'] + '">' + items['saved'][i]['title'] + '</a>'
+                                + '<span class="domain">(<a href="' + items['saved'][i]['place'] + '">' + items['saved'][i]['place'] + '</a>)</span>'
+                                + '</p><p class="tagline">' + items['saved'][i]['info'] + '</p><div class="child"></div>'
                                 + '<div class="clearleft"><!--IE6fix--></div>';
                         }
                     }
@@ -55,7 +53,7 @@ $(document).ready(function() {
                     saved += '</div>';
                     $('div#vee-saved-items').remove();
                     $('div#container').append(saved);
-                // });
+                });
                 $('div.sitetable').hide(100);
                 $('div#vee-saved-items').show();
                 $('a#vee-saved').text('Show main content');
@@ -67,8 +65,10 @@ $(document).ready(function() {
             }
         });
     }
+    // TODO determine here if the link has already been saved, and set the text to 'unsave'
     $('ul.flat-list.buttons').append('<li><a class="vee-save" title="save with Vee">save</a></li>');
     $('.vee-save').on('click', function() {
+        var linkObj = $(this);
         if ($(this).text() == 'save') {
             var link = $(this).parent().parent().find('li').first().find('a').attr('href');
             var title = $(this).parent().parent().parent().find('a.title').text();
@@ -77,31 +77,30 @@ $(document).ready(function() {
             var info = 'saved at ' +
                 [[now.getMonth() + 1, now.getDate(), now.getFullYear()].join("/") + ',', [now.getHours(),
                 now.getMinutes()].join(':'), now.getHours() >= 12 ? 'PM' : 'AM'].join(' ');
-            // chrome.storage.local.get('saved', function(items) {
-                if (items == null || items == undefined) {
+            chrome.storage.local.get('saved', function(items) {
+                if (items == null || items == undefined || items['saved'] == undefined || items['saved'].length < 1) {
                     items = [{link: link, title: title, place: place, info: info}];
-                    $(this).text('unsave');
-                    // TODO implement in Chrome storage
-                    // chrome.storage.local.set({'saved': [{link: link, title: title, place: place}]}, function() {
-                    //     console.log('first item saved');
-                    // });
+                    chrome.storage.local.set({'saved': items}, function() {
+                        $(linkObj).text('unsave');
+                    });
                 }
                 else {
-                    items.push({link: link, title: title, place: place, info: info});
-                    $(this).text('unsave');
-                    // TODO implement in Chrome storage
-                    // chrome.storage.local.set({'saved': saved.push({'link': link, 'title': title, 'place': place})}, function() {
-                    //     console.log('item saved');
-                    // });
+                    items['saved'].push({link: link, title: title, place: place, info: info});
+                    chrome.storage.local.set({'saved': items['saved']}, function() {
+                        $(linkObj).text('unsave');
+                    });
                 }
-            // });
+            });
         }
         else {
             var link = $(this).parent().parent().find('li').first().find('a').attr('href');
-            for (i = 0; i < items.length; i ++)
-                if (items[i]['link'] == link)
-                    items.splice(i, 1);
-            // TODO implement in Chrome storage
+            chrome.storage.local.get('saved', function(items) {
+                for (i = 0; i < items['saved'].length; i ++) {
+                    if (items['saved'][i]['link'] == link)
+                        items['saved'].splice(i, 1);
+                }
+                chrome.storage.local.set({'saved': items['saved']}, function() {});
+            });
             $(this).text('save');
         }
     });
@@ -164,7 +163,7 @@ $(document).keypress(function(e) {
             break;
         case 119:
             // w - open link
-            getDivs(true).each(function(index) {
+            getDivs(true).each(function() {
                 if ($(this).find('a.title').length > 0) {
                     window.open($(this).find('a.title').first().attr('href'));
                     return false;
@@ -173,11 +172,14 @@ $(document).keypress(function(e) {
             break;
         case 115:
             // s - save
-            // backburner
+            getDivs(true).each(function() {
+                $(this).find('a.vee-save').first().click();
+                return false;
+            });
             break;
         case 99:
             // c - open comments
-            getDivs(true).each(function(index) {
+            getDivs(true).each(function() {
                 if ($(this).find('a.comments').length > 0) {
                     window.open($(this).find('a.comments').first().attr('href'));
                     return false;
