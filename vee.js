@@ -120,7 +120,7 @@ $(document).keypress(function(e) {
                     arrow = $(this).parent().find('div[class*="arrow-upvote"]');
                 else
                     arrow = $(this).find('div[class*="arrow-upvote"]');
-                arrow.click();
+                arrow.first().click();
                 return false;
             });
             break;
@@ -132,7 +132,7 @@ $(document).keypress(function(e) {
                     arrow = $(this).parent().find('div[class*="arrow-downvote"]');
                 else
                     arrow = $(this).find('div[class*="arrow-downvote"]');
-                arrow.click();
+                arrow.first().click();
                 return false;
             });
             break;
