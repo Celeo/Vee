@@ -25,9 +25,48 @@ function clearHighlighting() {
 /*
 Load settings button on the homepage
 */
+var savedLoaded = false;
 $(document).ready(function() {
     if (window.location.pathname == '/') {
-        $('div.side>div.spacer').eq(7).after('<div class="spacer"><a href="/sets" class="btn-whoaverse btn-block">Saved Links &amp; Comments</a></div>');
+        $('div.side>div.spacer').eq(7)
+            .after('<div class="spacer"><a id="vee-saved"'
+            + 'class="btn-whoaverse btn-block contribute">Saved Links &amp; Comments</a></div>');
+        $('#vee-saved').on('click', function() {
+            if (savedLoaded === false) {
+                var saved = '<div id="vee-saved-items">';
+                chrome.storage.local.get('saved', function(items) {
+                    if (items !== null && items !== undefined && items.length > 0) {
+                        for (i = 0; i < items.length(); i ++) {
+                            saved += '<div class="submission link self">'
+                                + '<p class="parent"></p>'
+                                + '<span class="rank">' + i + '</span>'
+                                + '<p class="title">'
+                                + '<a class="title may-blank " href="LINK" tabindex="1" title="TITLE">TITLE</a>'
+                                + '</p>'
+                                + '<p class="tagline">' + item['text'] + '</p><div class="child"></div>'
+                                + '<div class="clearleft"><!--IE6fix--></div>';
+                        }
+                    }
+                    else {
+                        saved += '<div class="submission link self"><p class="parent"></p><span class="rank"></span><p class="title"><a class="title may-blank " tabindex="1" '
+                            + 'title="nothing here">nothing here</a></p><p class="tagline"></p><div class="child"></div><div class="clearleft"><!--IE6fix--></div>';
+                    }
+                    saved += '</div>'
+                    $('div#container').append(saved);
+                    savedLoaded = true;
+                });
+            }
+            if ($('a#vee-saved').text() == 'Saved Links & Comments') {
+                $('div.sitetable').hide(100);
+                $('div#vee-saved-items').show();
+                $('a#vee-saved').text('Show main content');
+            }
+            else {
+                $('div#vee-saved-items').hide();
+                $('div.sitetable').show(100);
+                $('a#vee-saved').text('Saved Links & Comments');
+            }
+        });
     }
 });
 
