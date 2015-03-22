@@ -136,5 +136,11 @@ $(document).keypress(function(e) {
                 return false;
             });
             break;
+        case 122:
+            // z - expand/contract images/videos
+            getDivs(true).each(function() {
+                $(this).find('.link-expando-type').click();
+            });
+            break;
     }
 });

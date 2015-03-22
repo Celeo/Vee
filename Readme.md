@@ -11,3 +11,4 @@ A simple, RES-inspired Chrome extension for making Voat more user-friendly.
 * r - open link and comments
 * e - vote up
 * d - vote down
+* z - expand/contract images/videos
