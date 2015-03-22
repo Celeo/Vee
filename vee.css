@@ -13,3 +13,8 @@
 a {
     cursor: pointer;
 }
+
+.vee-user-tag {
+    cursor: pointer;
+    padding-left: 1px;
+}

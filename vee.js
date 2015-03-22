@@ -162,6 +162,13 @@ $(document).ready(function() {
     });
 });
 
+$('a.author').each(function() {
+    $(this).after('<img src="' + chrome.extension.getURL('tag_10.png') + '" class="vee-user-tag">');
+});
+$('img.vee-user-tag').on('click', function() {
+    // ...
+});
+
 /*
 Handle navigating submissions by clicking
 */
