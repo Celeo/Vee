@@ -81,6 +81,11 @@ $(document).ready(function() {
             var link = $(this).parent().parent().find('li').first().find('a').attr('href');
             var title = $(this).parent().parent().parent().find('a.title').text();
             var place = $(this).parent().parent().parent().find('a').eq(1).text();
+            if (title == '') {
+                title = '/u/' + place + ' commented on "' + $('a.title').first().text() + '"';
+                var urlSplit = link.split('/');
+                place = [urlSplit[1], urlSplit[2], urlSplit[3], urlSplit[4]].join('/');
+            }
             var now = new Date();
             var info = 'saved at ' +
                 [[now.getMonth() + 1, now.getDate(), now.getFullYear()].join("/") + ',', [now.getHours(),
