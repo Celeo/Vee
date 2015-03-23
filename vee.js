@@ -23,6 +23,13 @@ function clearHighlighting() {
 }
 
 /*
+Custom subverse list for the top bar
+*/
+$(document).ready(function() {
+    $('ul#sr-bar').html('');
+});
+
+/*
 Load saved items button on the homepage and handle (un)saving items
 */
 $(document).ready(function() {
