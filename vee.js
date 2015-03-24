@@ -41,21 +41,22 @@ $(document).ready(function() {
         if ('subs' in items) {
             // add each as a list element to the string
             for (i = 0; i < items['subs'].length; i ++) {
-                console.log('adding ' + items['subs'][i] + ' to sub list');
                 subs += '<li class=""><span class="separator">-</span><a href="/v/'
                     + items['subs'][i] + '/">' + items['subs'][i] + '</a></li>';
             }
             // add subverse to list if not the homepage
             if (window.location.pathname !== '/') {
-                console.log('loading sub add button');
-                $('button.btn-whoaverse-paging.btn-xs.btn-default').first()
-                    .after('<button class="btn-whoaverse-paging btn-xs btn-default vee-sub-mod">- sub list</button>');
+                if (items['subs'].indexOf(getSubverseName()) > -1)
+                    $('button.btn-whoaverse-paging.btn-xs.btn-default').first()
+                        .after('<button class="btn-whoaverse-paging btn-xs btn-default vee-sub-mod">- sub list</button>');
+                else
+                    $('button.btn-whoaverse-paging.btn-xs.btn-default').first()
+                        .after('<button class="btn-whoaverse-paging btn-xs btn-default vee-sub-mod">+ sub list</button>');
             }
         }
         else {
             // add subverse to list if not the homepage
             if (window.location.pathname !== '/') {
-                console.log('loading sub add button');
                 $('button.btn-whoaverse-paging.btn-xs.btn-default').first()
                     .after('<button class="btn-whoaverse-paging btn-xs btn-default vee-sub-mod">+ sub list</button>');
             }
@@ -69,7 +70,7 @@ $(document).ready(function() {
                 if ('subs' in items)
                     items['subs'].push(getSubverseName());
                 else
-                    items['subs'] = getSubverseName();
+                    items['subs'] = [getSubverseName()];
             }
             else
                 items['subs'].splice(items['subs'].indexOf(getSubverseName()), 1);
