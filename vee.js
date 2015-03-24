@@ -23,10 +23,59 @@ function clearHighlighting() {
 }
 
 /*
+Returns the name of the subverse
+*/
+function getSubverseName() {
+    return $('a.subverse').first().text();
+}
+
+/*
 Custom subverse list for the top bar
 */
 $(document).ready(function() {
-    $('ul#sr-bar').html('');
+    // replace top bar with custom list
+    var subs = '';
+    // load custom sub list from storage
+    chrome.storage.local.get('subs', function(items) {
+        // if it exists,
+        if ('subs' in items) {
+            // add each as a list element to the string
+            for (i = 0; i < items['subs'].length; i ++) {
+                console.log('adding ' + items['subs'][i] + ' to sub list');
+                subs += '<li class=""><span class="separator">-</span><a href="/v/'
+                    + items['subs'][i] + '/">' + items['subs'][i] + '</a></li>';
+            }
+            // add subverse to list if not the homepage
+            if (window.location.pathname !== '/') {
+                console.log('loading sub add button');
+                $('button.btn-whoaverse-paging.btn-xs.btn-default').first()
+                    .after('<button class="btn-whoaverse-paging btn-xs btn-default vee-sub-mod">- sub list</button>');
+            }
+        }
+        else {
+            // add subverse to list if not the homepage
+            if (window.location.pathname !== '/') {
+                console.log('loading sub add button');
+                $('button.btn-whoaverse-paging.btn-xs.btn-default').first()
+                    .after('<button class="btn-whoaverse-paging btn-xs btn-default vee-sub-mod">+ sub list</button>');
+            }
+        }
+        // replace the top bar with the HTML build (or blank)
+        $('ul#sr-bar').html(subs);
+        // handler for clicking the sublist mod button
+        $('button.vee-sub-mod').on('click', function() {
+            // if we're to add this to the list
+            if ($(this).text().lastIndexOf('+', 0) === 0) {
+                if ('subs' in items)
+                    items['subs'].push(getSubverseName());
+                else
+                    items['subs'] = getSubverseName();
+            }
+            else
+                items['subs'].splice(items['subs'].indexOf(getSubverseName()), 1);
+            chrome.storage.local.set({'subs': items['subs']}, function() {});
+        });
+    });
 });
 
 /*
