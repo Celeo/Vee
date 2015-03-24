@@ -67,13 +67,33 @@ $(document).ready(function() {
         $('button.vee-sub-mod').on('click', function() {
             // if we're to add this to the list
             if ($(this).text().lastIndexOf('+', 0) === 0) {
-                if ('subs' in items)
+                if ('subs' in items) {
                     items['subs'].push(getSubverseName());
-                else
+                    $('ul#sr-bar').append('<li class=""><span class="separator">-</span><a href="/v/'
+                        + getSubverseName() + '/">' + getSubverseName() + '</a></li>');
+                    $(this).text('- sub list');
+                }
+                else {
                     items['subs'] = [getSubverseName()];
+                    $('ul#sr-bar').find('li').each(function(index) {
+                        if ($(this).find('a').first().text() == getSubverseName()) {
+                            $(this).remove();
+                            return false;
+                        }
+                    });
+                    $(this).text('+ sub list');
+                }
             }
-            else
+            else {
                 items['subs'].splice(items['subs'].indexOf(getSubverseName()), 1);
+                $('ul#sr-bar').find('li').each(function(index) {
+                    if ($(this).find('a').first().text() == getSubverseName()) {
+                        $(this).remove();
+                        return false;
+                    }
+                });
+                $(this).text('+ sub list');
+            }
             chrome.storage.local.set({'subs': items['subs']}, function() {});
         });
     });
