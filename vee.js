@@ -7,9 +7,9 @@ function getDivs(justHighlighted) {
         justHighlighted = false;
     var ret;
     if (window.location.pathname.indexOf('/comments/') > -1)
-        ret = justHighlighted ? $('div.highlighted') : $('div.entry:visible');
+        ret = justHighlighted ? $('div.vee-highlighted') : $('div.entry:visible');
     else
-        ret = justHighlighted ? $('div.highlighted') : $('div.submission');
+        ret = justHighlighted ? $('div.vee-highlighted') : $('div.submission');
     return ret;
 }
 
@@ -18,7 +18,7 @@ Removes highlighting from all divs
 */
 function clearHighlighting() {
     getDivs(true).each(function() {
-        $(this).removeClass('highlighted');
+        $(this).removeClass('vee-highlighted');
     });
 }
 
@@ -301,7 +301,7 @@ $('div.submission').on('click', function() {
         clearHighlighting();
     });
     // highlight this div
-    $(this).addClass('highlighted');
+    $(this).addClass('vee-highlighted');
 });
 $('div.entry').on('click', function() {
     // if this is the homepage, ignore the featured sub link
@@ -312,7 +312,7 @@ $('div.entry').on('click', function() {
         clearHighlighting();
     });
     // highlight this div
-    $(this).addClass('highlighted');
+    $(this).addClass('vee-highlighted');
 });
 
 /*
@@ -326,21 +326,27 @@ $(document).keypress(function(e) {
     switch (e.keyCode) {
         case 113:
             // q - move up
+            var found = false;
             // for each possible div,
             getDivs().each(function(index) {
                 // if it's highlighted,
-                if ($(this).hasClass('highlighted')) {
+                if ($(this).hasClass('vee-highlighted')) {
                     // and not before the first valid div on the page,
                     if (index > (window.location.pathname == '/' ? 1 : 0)) {
                         // clear highlighting for all divs
                         clearHighlighting();
+                        // mark that we found it
+                        found = true;
                         // and highlight this div
-                        getDivs().eq(index - 1).addClass('highlighted');
+                        getDivs().eq(index - 1).addClass('vee-highlighted');
                         // break from the each
                         return false;
                     }
                 }
             });
+            // if nothing was found (nothing highlighted), then highlight the first valid div on the page
+            if (!found)
+                getDivs().eq(window.location.pathname == '/' ? 1 : 0).addClass('vee-highlighted');
             break;
         case 97:
             // a - move down
@@ -348,20 +354,20 @@ $(document).keypress(function(e) {
             // for each possible div,
             getDivs().each(function(index) {
                 // if it's highlighted,
-                if ($(this).hasClass('highlighted')) {
+                if ($(this).hasClass('vee-highlighted')) {
                     // clear highlighting for all divs
                     clearHighlighting();
                     // mark that we found it
                     found = true;
                     // and highlight this div
-                    getDivs().eq(index + 1).addClass('highlighted');
+                    getDivs().eq(index + 1).addClass('vee-highlighted');
                     // break from the each
                     return false;
                 }
             });
             // if nothing was found (nothing highlighted), then highlight the first valid div on the page
             if (!found)
-                getDivs().eq(window.location.pathname == '/' ? 1 : 0).addClass('highlighted');
+                getDivs().eq(window.location.pathname == '/' ? 1 : 0).addClass('vee-highlighted');
             break;
         case 119:
             // w - open link
