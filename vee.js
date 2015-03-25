@@ -62,12 +62,16 @@ $(document).ready(function() {
             }
         }
         // replace the top bar with the HTML build (or blank)
-        $('ul#sr-bar').html(subs);
+        // so long as there are selected subs (otherwise show the default bar)
+        if (subs !== '')
+            $('ul#sr-bar').html(subs);
         // handler for clicking the sublist mod button
         $('button.vee-sub-mod').on('click', function() {
             // if we're to add this to the list
             if ($(this).text().lastIndexOf('+', 0) === 0) {
                 if ('subs' in items) {
+                    if (items['subs'].length === 0)
+                        $('ul#sr-bar').html('');
                     items['subs'].push(getSubverseName());
                     $('ul#sr-bar').append('<li class=""><span class="separator">-</span><a href="/v/'
                         + getSubverseName() + '/">' + getSubverseName() + '</a></li>');
