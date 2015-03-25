@@ -239,6 +239,49 @@ $(document).ready(function() {
     });
 });
 
+var tags;
+chrome.storage.local.get('tags', function(items) {
+    tags = items;
+    if (tags['tags'] !== undefined) {
+        $('a.author').each(function() {
+            if ($(this).text() in tags['tags'])
+                $(this).after('<span class="vee-user-tag">' + tags['tags'][$(this).text()] + '</span><img src="'
+                    + chrome.extension.getURL('tag_10.png') + '" class="vee-user-tag-tag">');
+            else
+                $(this).after('<span class="vee-user-tag" style="display: none;"></span><img src="'
+                    + chrome.extension.getURL('tag_10.png') + '" class="vee-user-tag-tag">');
+        });
+    }
+    else {
+        $('a.author').each(function() {
+            $(this).after('<span class="vee-user-tag" style="display: none;"></span><img src="'
+                + chrome.extension.getURL('tag_10.png') + '" class="vee-user-tag-tag">');
+        });
+    }
+    $('a#vee-user-tag-edit-cancel').on('on', function() {
+        $('div.vee-user-tag-edit').remove();
+    });
+    $('img.vee-user-tag-tag').on('click', function() {
+        $(this).after('<div class="vee-user-tag-edit" style="left: '
+            + ($(this).position().left + 10) + 'px; top: ' + ($(this).position().top + 10) + 'px;">'
+            + '<span>' + $(this).prev().prev().text() + '</span>'
+            + '<h2>Tag for ' + $(this).prev().prev().text() + '</h2>'
+            + '<a onclick="$(this).parent().remove();">X</a>'
+            + '<input type="text" placeholder="tag"><br />'
+            + '<button id="vee-user-tag-edit-set">Set</button>'
+            + '</div>');
+        $('button#vee-user-tag-edit-set').on('click', function() {
+            tags['tags'][$('div.vee-user-tag-edit').find('span').text()] = $('div.vee-user-tag-edit').find('input').val();
+            chrome.storage.local.set({'tags': tags['tags']}, function() {
+                $('div.vee-user-tag-edit').prev().prev().css('visibility', 'visible');
+                $('div.vee-user-tag-edit').prev().prev().text($('div.vee-user-tag-edit').find('input').val());
+                $('div.vee-user-tag-edit').prev().prev().show();
+                $('div.vee-user-tag-edit').remove();
+            });
+        });
+    });
+});
+
 /*
 Handle navigating submissions by clicking
 */

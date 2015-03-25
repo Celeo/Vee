@@ -13,3 +13,45 @@
 a {
     cursor: pointer;
 }
+
+span.vee-user-tag {
+    padding: 1px;
+    margin-left: 2px;
+    border: 1px solid gray;
+}
+
+img.vee-user-tag-tag {
+    cursor: pointer;
+    margin-left: 2px;
+}
+
+div.vee-user-tag-edit {
+    padding: 20px;
+    background-color: white;
+    z-index: 20;
+    position: absolute;
+    border: 1px solid black;
+}
+
+div.vee-user-tag-edit h2 {
+    margin-bottom: 5px;
+}
+
+div.vee-user-tag-edit span {
+    display: none;
+}
+
+div.vee-user-tag-edit input {
+    margin: 0 5px 5px 0;
+    padding: 2px;
+}
+
+div.vee-user-tag-edit a {
+    float: right;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 125%;
+    padding: 2px;
+    border: 1px solid gray;
+}
