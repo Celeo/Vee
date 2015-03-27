@@ -275,6 +275,12 @@ chrome.storage.local.get('tags', function(items) {
             + '<button id="vee-user-tag-edit-set">Set</button>'
             + '</div>');
         $('button#vee-user-tag-edit-set').on('click', function() {
+            // if this is the first tag
+            if (!('tags' in tags)) {
+                // make an entry in the dictionary
+                tags = {};
+                tags['tags'] = [];
+            }
             tags['tags'][$('div.vee-user-tag-edit').find('span').text()] = $('div.vee-user-tag-edit').find('input').val();
             chrome.storage.local.set({'tags': tags['tags']}, function() {
                 $('div.vee-user-tag-edit').prev().prev().css('visibility', 'visible');
