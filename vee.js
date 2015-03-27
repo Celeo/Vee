@@ -168,14 +168,16 @@ $(document).ready(function() {
     // check to see if there are any previously-saved items
     chrome.storage.local.get('saved', function(items) {
         // iterate through all of them, checking to see if they are on the currently-loaded page
-        for (i = 0; i < items['saved'].length; i ++) {
-            $('a.vee-save').each(function() {
-                // if this saved item is on the page,
-                if ($(this).parent().parent().find('li').first().find('a').attr('href') == items['saved'][i]['link']) {
-                    // turn its save link text into 'unsave'
-                    $(this).text('unsave');
-                }
-            });
+        if ('saved' in items) {
+            for (i = 0; i < items['saved'].length; i ++) {
+                $('a.vee-save').each(function() {
+                    // if this saved item is on the page,
+                    if ($(this).parent().parent().find('li').first().find('a').attr('href') == items['saved'][i]['link']) {
+                        // turn its save link text into 'unsave'
+                        $(this).text('unsave');
+                    }
+                });
+            }
         }
     });
     // listener for a (un)save link being clicked
@@ -243,29 +245,42 @@ $(document).ready(function() {
     });
 });
 
+// local memory storage of tags
 var tags;
+// get tags from storage
 chrome.storage.local.get('tags', function(items) {
+    // set to local reference
     tags = items;
+    // if there are tags from storage,
     if (tags['tags'] !== undefined) {
+        // append the appropriate tags to author links currently on the page
         $('a.author').each(function() {
+            // if this user has a tag,
             if ($(this).text() in tags['tags'])
+                // add it
                 $(this).after('<span class="vee-user-tag">' + tags['tags'][$(this).text()] + '</span><img src="'
                     + chrome.extension.getURL('tag_10.png') + '" class="vee-user-tag-tag">');
             else
+                // otherwise, just show the tag icon link
                 $(this).after('<span class="vee-user-tag" style="display: none;"></span><img src="'
                     + chrome.extension.getURL('tag_10.png') + '" class="vee-user-tag-tag">');
         });
     }
     else {
+        // no tags - just show the tag icon link
         $('a.author').each(function() {
             $(this).after('<span class="vee-user-tag" style="display: none;"></span><img src="'
                 + chrome.extension.getURL('tag_10.png') + '" class="vee-user-tag-tag">');
         });
     }
+    // when the X button on the floating window is clicked,
     $('a#vee-user-tag-edit-cancel').on('on', function() {
+        // delete the floating window
         $('div.vee-user-tag-edit').remove();
     });
+    // when a tag icon is clicked,
     $('img.vee-user-tag-tag').on('click', function() {
+        // popup an editing window
         $(this).after('<div class="vee-user-tag-edit" style="left: '
             + ($(this).position().left + 10) + 'px; top: ' + ($(this).position().top + 10) + 'px;">'
             + '<span>' + $(this).prev().prev().text() + '</span>'
@@ -274,6 +289,7 @@ chrome.storage.local.get('tags', function(items) {
             + '<input type="text" placeholder="tag"><br />'
             + '<button id="vee-user-tag-edit-set">Set</button>'
             + '</div>');
+        // when the save button is clicked,
         $('button#vee-user-tag-edit-set').on('click', function() {
             // if this is the first tag
             if (!('tags' in tags)) {
@@ -281,7 +297,9 @@ chrome.storage.local.get('tags', function(items) {
                 tags = {};
                 tags['tags'] = [];
             }
+            // set the value
             tags['tags'][$('div.vee-user-tag-edit').find('span').text()] = $('div.vee-user-tag-edit').find('input').val();
+            // store the new tag back into storage
             chrome.storage.local.set({'tags': tags['tags']}, function() {
                 $('div.vee-user-tag-edit').prev().prev().css('visibility', 'visible');
                 $('div.vee-user-tag-edit').prev().prev().text($('div.vee-user-tag-edit').find('input').val());
