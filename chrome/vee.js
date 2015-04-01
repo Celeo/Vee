@@ -245,66 +245,155 @@ $(document).ready(function() {
     });
 });
 
-// local memory storage of tags
-var tags;
-// get tags from storage
-chrome.storage.local.get('tags', function(items) {
-    // set to local reference
-    tags = items;
-    // if there are tags from storage,
-    if (tags['tags'] !== undefined) {
-        // append the appropriate tags to author links currently on the page
-        $('a.author').each(function() {
-            // if this user has a tag,
-            if ($(this).text() in tags['tags'])
-                // add it
-                $(this).after('<span class="vee-user-tag">' + tags['tags'][$(this).text()] + '</span><img src="'
-                    + chrome.extension.getURL('tag_10.png') + '" class="vee-user-tag-tag">');
-            else
-                // otherwise, just show the tag icon link
+/*
+
+*/
+$(document).ready(function() {
+    // local memory storage of tags
+    var tags;
+    // get tags from storage
+    chrome.storage.local.get('tags', function(items) {
+        // set to local reference
+        tags = items;
+        // if there are tags from storage,
+        if (tags['tags'] !== undefined) {
+            // append the appropriate tags to author links currently on the page
+            $('a.author').each(function() {
+                // if this user has a tag,
+                if ($(this).text() in tags['tags'])
+                    // add it
+                    $(this).after('<span class="vee-user-tag">' + tags['tags'][$(this).text()] + '</span><img src="'
+                        + chrome.extension.getURL('tag_10.png') + '" class="vee-user-tag-tag">');
+                else
+                    // otherwise, just show the tag icon link
+                    $(this).after('<span class="vee-user-tag" style="display: none;"></span><img src="'
+                        + chrome.extension.getURL('tag_10.png') + '" class="vee-user-tag-tag">');
+            });
+        }
+        else {
+            // no tags - just show the tag icon link
+            $('a.author').each(function() {
                 $(this).after('<span class="vee-user-tag" style="display: none;"></span><img src="'
                     + chrome.extension.getURL('tag_10.png') + '" class="vee-user-tag-tag">');
+            });
+        }
+        // when the X button on the floating window is clicked,
+        $('a#vee-user-tag-edit-cancel').on('on', function() {
+            // delete the floating window
+            $('div.vee-user-tag-edit').remove();
         });
-    }
-    else {
-        // no tags - just show the tag icon link
-        $('a.author').each(function() {
-            $(this).after('<span class="vee-user-tag" style="display: none;"></span><img src="'
-                + chrome.extension.getURL('tag_10.png') + '" class="vee-user-tag-tag">');
+        // when a tag icon is clicked,
+        $('img.vee-user-tag-tag').on('click', function() {
+            // popup an editing window
+            $(this).after('<div class="vee-user-tag-edit" style="left: '
+                + ($(this).position().left + 10) + 'px; top: ' + ($(this).position().top + 10) + 'px;">'
+                + '<span>' + $(this).prev().prev().text() + '</span>'
+                + '<h2>Tag for ' + $(this).prev().prev().text() + '</h2>'
+                + '<a onclick="$(this).parent().remove();">X</a>'
+                + '<input type="text" placeholder="tag"><br />'
+                + '<button id="vee-user-tag-edit-set">Set</button>'
+                + '</div>');
+            // when the save button is clicked,
+            $('button#vee-user-tag-edit-set').on('click', function() {
+                // if this is the first tag
+                if (!('tags' in tags)) {
+                    // make an entry in the dictionary
+                    tags = {};
+                    tags['tags'] = [];
+                }
+                // set the value
+                tags['tags'][$('div.vee-user-tag-edit').find('span').text()] = $('div.vee-user-tag-edit').find('input').val();
+                // store the new tag back into storage
+                chrome.storage.local.set({'tags': tags['tags']}, function() {
+                    $('div.vee-user-tag-edit').prev().prev().css('visibility', 'visible');
+                    $('div.vee-user-tag-edit').prev().prev().text($('div.vee-user-tag-edit').find('input').val());
+                    $('div.vee-user-tag-edit').prev().prev().show();
+                    $('div.vee-user-tag-edit').remove();
+                });
+            });
         });
-    }
-    // when the X button on the floating window is clicked,
-    $('a#vee-user-tag-edit-cancel').on('on', function() {
-        // delete the floating window
-        $('div.vee-user-tag-edit').remove();
     });
-    // when a tag icon is clicked,
-    $('img.vee-user-tag-tag').on('click', function() {
-        // popup an editing window
-        $(this).after('<div class="vee-user-tag-edit" style="left: '
-            + ($(this).position().left + 10) + 'px; top: ' + ($(this).position().top + 10) + 'px;">'
-            + '<span>' + $(this).prev().prev().text() + '</span>'
-            + '<h2>Tag for ' + $(this).prev().prev().text() + '</h2>'
-            + '<a onclick="$(this).parent().remove();">X</a>'
-            + '<input type="text" placeholder="tag"><br />'
-            + '<button id="vee-user-tag-edit-set">Set</button>'
-            + '</div>');
-        // when the save button is clicked,
-        $('button#vee-user-tag-edit-set').on('click', function() {
-            // if this is the first tag
-            if (!('tags' in tags)) {
-                // make an entry in the dictionary
-                tags = {};
-                tags['tags'] = [];
+});
+
+/*
+Add and handle hide links
+*/
+$(document).ready(function() {
+    // add hide links to submissions
+    if (window.location.pathname.indexOf('/comments/') > -1)
+        $('ul.flat-list.buttons').first().append('<li><a class="vee-hide" title="hide with Vee">hide</a></li>');
+    else
+        $('ul.flat-list.buttons').append('<li><a class="vee-hide" title="hide with Vee">hide</a></li>');
+    // check to see if there are any previously-hidden items
+    chrome.storage.local.get('hidden', function(items) {
+        if (items !== null && items !== undefined && items['hidden'] !== undefined && items['hidden'].length > 0) {
+            // iterate through all of them, checking to see if they are on the currently-loaded page
+            // if this is a comments page
+            var commentsPage = window.location.pathname.indexOf('/comments/') > -1;
+            for (i = 0; i < items['hidden'].length; i ++) {
+                $('a.vee-hide').each(function() {
+                    // submission id
+                    var submissionId;
+                    if (commentsPage)
+                        submissionId = $(this).parent().parent().parent().parent().attr('id').split('-')[1];
+                    else
+                        submissionId = $(this).parent().parent().parent().parent().attr('data-fullname');
+                    // if this hidden item is on the page,
+                    if (submissionId == items['hidden'][i]) {
+                        if (commentsPage) {
+                            // show unhide link
+                            $('a.vee-hide').text('unhide');
+                        }
+                        else {
+                            // hide the div
+                            $(this).parent().parent().parent().parent().first().hide(100);
+                        }
+                    }
+                });
             }
-            // set the value
-            tags['tags'][$('div.vee-user-tag-edit').find('span').text()] = $('div.vee-user-tag-edit').find('input').val();
-            // store the new tag back into storage
-            chrome.storage.local.set({'tags': tags['tags']}, function() {
-                $('div.vee-user-tag-edit').prev().prev().css('visibility', 'visible');
-                $('div.vee-user-tag-edit').prev().prev().text($('div.vee-user-tag-edit').find('input').val());
-                $('div.vee-user-tag-edit').prev().prev().show();
-                $('div.vee-user-tag-edit').remove();
+        }
+    });
+    // listener for hide links
+    $('a.vee-hide').on('click', function() {
+        // get the id of the surrounding div
+        var linkObj = $(this);
+        // if this is a comments page
+        var commentsPage = window.location.pathname.indexOf('/comments/') > -1;
+        // if the item is to be hidden
+        var doHide = linkObj.text() == 'hide';
+        // submission id
+        var submissionId;
+        if (commentsPage)
+            submissionId = linkObj.parent().parent().parent().parent().attr('id').split('-')[1];
+        else
+            submissionId = linkObj.parent().parent().parent().parent().attr('data-fullname');
+        // get all hidden ids from storage
+        chrome.storage.local.get('hidden', function(items) {
+            // if there are other entries in storage
+            if (!(items == null || items == undefined || items['hidden'] == undefined || items['hidden'].length < 1)) {
+                if (doHide) {
+                    // if there are other entries and we're hiding this item,
+                    // add it to the list
+                    items['hidden'].push(submissionId);
+                }
+                else if(commentsPage) {
+                    // if we're unhiding this item,
+                    // remove it from the list
+                    items['hidden'].splice(items['hidden'].indexOf(submissionId), 1);
+                }
+            }
+            else if (doHide) {
+                // set the item as the list
+                items['hidden'] = [submissionId];
+            }
+            // set the text
+            linkObj.text(doHide ? 'unhide' : 'hide');
+            // store in storage
+            chrome.storage.local.set({'hidden': items['hidden']}, function() {
+                // on success, if this isn't a comments page,
+                if (!commentsPage)
+                    // hide the submission
+                    linkObj.parent().parent().parent().parent().first().hide(100);
             });
         });
     });
