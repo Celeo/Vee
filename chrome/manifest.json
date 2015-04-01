@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Vee",
-    "version": "4.1.2",
+    "version": "5.0.0",
     "description": "Vee",
     "content_scripts": [
         {
