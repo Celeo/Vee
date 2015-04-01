@@ -311,6 +311,91 @@ chrome.storage.local.get('tags', function(items) {
 });
 
 /*
+Add and handle hide links
+*/
+$(document).ready(function() {
+    chrome.storage.local.remove('hidden'); // TODO remove
+    // add hide links to submissions
+    if (window.location.pathname.indexOf('/comments/') > -1)
+        $('ul.flat-list.buttons').first().append('<li><a class="vee-hide" title="hide with Vee">hide</a></li>');
+    else
+        $('ul.flat-list.buttons').append('<li><a class="vee-hide" title="hide with Vee">hide</a></li>');
+    // check to see if there are any previously-hidden items
+    chrome.storage.local.get('hidden', function(items) {
+        if (items !== null && items !== undefined && items['hidden'] !== undefined && items['hidden'].length > 0) {
+            // iterate through all of them, checking to see if they are on the currently-loaded page
+            for (i = 0; i < items['hidden'].length; i ++) {
+                console.log('looking to hide div id ' + items['hidden'][i]);
+                $('a.vee-hide').each(function() {
+                    // if this hidden item is on the page,
+                    console.log($(this).parent().parent().parent().prop('id'));
+                    if ($(this).parent().parent().parent().prop('id') == items['hidden'][i]) {
+                        if (window.location.pathname.indexOf('/comments/') > -1) {
+                            // show unhide link
+                            $('a.vee-hide').text('unhide');
+                            console.log('comments page unhide link');
+                        }
+                        else {
+                            // hide the div
+                            $(this).parent().parent().parent().first().hide(100);   
+                        }
+                    }
+                });
+            }
+        }
+    });
+    // listener for hide links
+    $('a.vee-hide').on('click', function() {
+        // get the id of the surrounding div
+        var linkObj = $(this);
+        var divid = linkObj.parent().parent().parent().prop('id');
+        console.log('hiding ' + divid);
+        // get all hidden ids from storage
+        chrome.storage.local.get('hidden', function(items) {
+            // if there are already items in storage,
+            if (items == null || items == undefined || items['hidden'] == undefined || items['hidden'].length < 1) {
+                // first hidden item
+                items = [divid];
+                // and store back into storage
+                chrome.storage.local.set({'hidden': items}, function() {
+                    // hide the div
+                    if (window.location.pathname.indexOf('/comments/') > -1)
+                        // toggle hidden status of the submission but don't hide anyting
+                        $('a.vee-hide').text('unhide');
+                    else
+                        // toggle hidden status and hide the submission
+                        linkObj.parent().parent().parent().parent().first().hide(100);
+                    console.log('item hidden');
+                });
+            }
+            else {
+                if ($(this).text() == 'hide') {
+                    // hide
+                    // add this id to the array
+                    items['hidden'].push(divid);
+                }
+                else {
+                    // unhide
+                    
+                }
+                // and store back into storage
+                chrome.storage.local.set({'hidden': items['hidden']}, function() {
+                    // hide the div
+                    if (window.location.pathname.indexOf('/comments/') > -1)
+                        // TODO store
+                        $('a.vee-hide').text('unhide');
+                    else{
+                        // TOOD store
+                        linkObj.parent().parent().parent().parent().first().hide(100);
+                    }
+                    console.log('first item hidden');
+                });
+            }
+        });
+    });
+});
+
+/*
 Handle navigating submissions by clicking
 */
 $('div.submission').on('click', function() {
