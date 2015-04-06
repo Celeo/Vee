@@ -246,7 +246,7 @@ $(document).ready(function() {
 });
 
 /*
-
+User tags
 */
 $(document).ready(function() {
     // local memory storage of tags
@@ -319,6 +319,63 @@ $(document).ready(function() {
 Add and handle hide links
 */
 $(document).ready(function() {
+    // if the user is on the main page, add a button to show all hidden links
+    if (window.location.pathname == '/') {
+        // add the button to show the saved items to the sidebar
+        $('div.side>div.spacer').eq(8)
+            .after('<div class="spacer"><a id="vee-hidden"'
+            + 'class="btn-whoaverse btn-block contribute">Hidden submissions</a></div>');
+        // listener for that button being clicked
+        $('#vee-hidden').on('click', function() {
+            // if the button's text is to show the saved items,
+            if ($('a#vee-hidden').text() == 'Hidden submissions') {
+                // start building the HTML
+                var saved = '<div id="vee-hidden-items"><h1>Hidden submission</h1>';
+                // load the saved items from storage
+                chrome.storage.local.get('hidden', function(items) {
+                    // if there is anything previously stored,
+                    if (items !== null && items !== undefined && items['hidden'] !== undefined && items['hidden'].length > 0) {
+                        // iterate through each of them and add them to the HTML being built
+                        for (i = 0; i < items['hidden'].length; i ++) {
+                            saved += '<div class="submission link self">'
+                                + '<p class="parent"></p>'
+                                + '<p class="title">'
+                                + '<a class="title may-blank " href="' + items['hidden'][i]['subverse'] + '" tabindex="1" title="'
+                                + items['hidden'][i]['title'] + '">' + items['hidden'][i]['id'] + '</a>'
+                                + '<span class="domain">(<a href="' + items['hidden'][i]['place'] + '">' + items['hidden'][i]['place'] + '</a>)</span>'
+                                + '</p><p class="tagline">' + items['hidden'][i]['info'] + '</p><div class="child"></div>'
+                                + '<div class="clearleft"><!--IE6fix--></div>';
+                        }
+                    }
+                    else {
+                        // otherwise, there's nothing in storage
+                        saved += '<div class="submission link self"><p class="parent"></p><span class="rank"></span><p class="title"><a class="title may-blank " tabindex="1" '
+                            + 'title="nothing here">nothing here</a></p><p class="tagline"></p><div class="child"></div><div class="clearleft"><!--IE6fix--></div>';
+                    }
+                    // finish off the HTML
+                    saved += '</div>';
+                    // remove any previously-loaded HTML readout
+                    $('div#vee-hidden-items').remove();
+                    // and insert out HTML into the page
+                    $('div#container').append(saved);
+                });
+                // hide the main contents
+                $('div.sitetable').hide(100);
+                // and show out saved items HTML
+                $('div#vee-hidden-items').show();
+                // switch the button text so we know to reverse this process next time
+                $('a#vee-hidden').text('Show main content');
+            }
+            else {
+                // hide out saved items readout
+                $('div#vee-hidden-items').hide();
+                // and bring back the main content
+                $('div.sitetable').show(100);
+                // and switch the button text back
+                $('a#vee-hidden').text('Hidden submissions');
+            }
+        });
+    }
     // add hide links to submissions
     if (window.location.pathname.indexOf('/comments/') > -1)
         $('ul.flat-list.buttons').first().append('<li><a class="vee-hide" title="hide with Vee">hide</a></li>');
