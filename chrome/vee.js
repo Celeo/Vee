@@ -330,38 +330,47 @@ $(document).ready(function() {
             // if the button's text is to show the saved items,
             if ($('a#vee-hidden').text() == 'Hidden submissions') {
                 // start building the HTML
-                var saved = '<div id="vee-hidden-items"><h1>Hidden submission</h1>';
-                // load the saved items from storage
+                var hidden = '<div id="vee-hidden-items"><h1>Hidden submission</h1>';
+                // load the hidden items from storage
                 chrome.storage.local.get('hidden', function(items) {
                     // if there is anything previously stored,
                     if (items !== null && items !== undefined && items['hidden'] !== undefined && items['hidden'].length > 0) {
                         // iterate through each of them and add them to the HTML being built
                         for (i = 0; i < items['hidden'].length; i ++) {
-                            saved += '<div class="submission link self">'
-                                + '<p class="parent"></p>'
-                                + '<p class="title">'
-                                + '<a class="title may-blank " href="' + items['hidden'][i]['subverse'] + '" tabindex="1" title="'
-                                + items['hidden'][i]['title'] + '">' + items['hidden'][i]['id'] + '</a>'
-                                + '<span class="domain">(<a href="' + items['hidden'][i]['place'] + '">' + items['hidden'][i]['place'] + '</a>)</span>'
-                                + '</p><p class="tagline">' + items['hidden'][i]['info'] + '</p><div class="child"></div>'
-                                + '<div class="clearleft"><!--IE6fix--></div>';
+                            // get the subverse from the Voat API
+                            $.ajax({
+                                url: 'https://voat.co/api/singlesubmission?id=' + items['hidden'][i],
+                                dataType: 'json',
+                                success: function(data) {
+                                    hidden += '<div class="submission link self">'
+                                        + '<p class="parent"></p>'
+                                        + '<p class="title">'
+                                        + '<a class="title may-blank " href="/v/' + data['Subverse'] + '/comments/' + items['hidden'][i] + '" tabindex="1" title="'
+                                        + data['Title'] + '">' + data['Title'] + '</a>'
+                                        + '<span class="domain">(<a href="/v/' + data['Subverse'] + '/comments/' + items['hidden'][i] + '">' + data['Subverse'] + '</a>)</span>'
+                                        + '</p><p class="tagline"></p><div class="child"></div>'
+                                        + '<div class="clearleft"><!--IE6fix--></div>';
+                                },
+                                // make the Ajax calls synchronous
+                                async: false
+                            });
                         }
                     }
                     else {
                         // otherwise, there's nothing in storage
-                        saved += '<div class="submission link self"><p class="parent"></p><span class="rank"></span><p class="title"><a class="title may-blank " tabindex="1" '
+                        hidden += '<div class="submission link self"><p class="parent"></p><span class="rank"></span><p class="title"><a class="title may-blank " tabindex="1" '
                             + 'title="nothing here">nothing here</a></p><p class="tagline"></p><div class="child"></div><div class="clearleft"><!--IE6fix--></div>';
                     }
                     // finish off the HTML
-                    saved += '</div>';
+                    hidden += '</div>';
                     // remove any previously-loaded HTML readout
                     $('div#vee-hidden-items').remove();
                     // and insert out HTML into the page
-                    $('div#container').append(saved);
+                    $('div#container').append(hidden);
                 });
                 // hide the main contents
                 $('div.sitetable').hide(100);
-                // and show out saved items HTML
+                // and show out hidden items HTML
                 $('div#vee-hidden-items').show();
                 // switch the button text so we know to reverse this process next time
                 $('a#vee-hidden').text('Show main content');
