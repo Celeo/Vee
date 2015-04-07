@@ -1,4 +1,9 @@
 /*
+Firefox
+*/
+var data = require('sdk/simple-storage');
+
+/*
 Returns the div elements to iterate through, based on the 
 current window's URL and the bool parameter.
 */
@@ -35,72 +40,68 @@ Custom subverse list for the top bar
 $(document).ready(function() {
     // replace top bar with custom list
     var subs = '';
-    // load custom sub list from storage
-    // chrome.storage.local.get('subs', function(items) {
-    //     // if it exists,
-    //     if ('subs' in items) {
-    //         // add each as a list element to the string
-    //         for (i = 0; i < items['subs'].length; i ++) {
-    //             subs += '<li class=""><span class="separator">-</span><a href="/v/'
-    //                 + items['subs'][i] + '/">' + items['subs'][i] + '</a></li>';
-    //         }
-    //         // add subverse to list if not the homepage
-    //         if (window.location.pathname !== '/') {
-    //             if (items['subs'].indexOf(getSubverseName()) > -1)
-    //                 $('button.btn-whoaverse-paging.btn-xs.btn-default').first()
-    //                     .after('<button class="btn-whoaverse-paging btn-xs btn-default vee-sub-mod">- sub list</button>');
-    //             else
-    //                 $('button.btn-whoaverse-paging.btn-xs.btn-default').first()
-    //                     .after('<button class="btn-whoaverse-paging btn-xs btn-default vee-sub-mod">+ sub list</button>');
-    //         }
-    //     }
-    //     else {
-    //         // add subverse to list if not the homepage
-    //         if (window.location.pathname !== '/') {
-    //             $('button.btn-whoaverse-paging.btn-xs.btn-default').first()
-    //                 .after('<button class="btn-whoaverse-paging btn-xs btn-default vee-sub-mod">+ sub list</button>');
-    //         }
-    //     }
-    //     // replace the top bar with the HTML build (or blank)
-    //     // so long as there are selected subs (otherwise show the default bar)
-    //     if (subs !== '')
-    //         $('ul#sr-bar').html(subs);
-    //     // handler for clicking the sublist mod button
-    //     $('button.vee-sub-mod').on('click', function() {
-    //         // if we're to add this to the list
-    //         if ($(this).text().lastIndexOf('+', 0) === 0) {
-    //             if ('subs' in items) {
-    //                 if (items['subs'].length === 0)
-    //                     $('ul#sr-bar').html('');
-    //                 items['subs'].push(getSubverseName());
-    //                 $('ul#sr-bar').append('<li class=""><span class="separator">-</span><a href="/v/'
-    //                     + getSubverseName() + '/">' + getSubverseName() + '</a></li>');
-    //                 $(this).text('- sub list');
-    //             }
-    //             else {
-    //                 items['subs'] = [getSubverseName()];
-    //                 $('ul#sr-bar').find('li').each(function(index) {
-    //                     if ($(this).find('a').first().text() == getSubverseName()) {
-    //                         $(this).remove();
-    //                         return false;
-    //                     }
-    //                 });
-    //                 $(this).text('+ sub list');
-    //             }
-    //         }
-    //         else {
-    //             items['subs'].splice(items['subs'].indexOf(getSubverseName()), 1);
-    //             $('ul#sr-bar').find('li').each(function(index) {
-    //                 if ($(this).find('a').first().text() == getSubverseName()) {
-    //                     $(this).remove();
-    //                     return false;
-    //                 }
-    //             });
-    //             $(this).text('+ sub list');
-    //         }
-    //         chrome.storage.local.set({'subs': items['subs']}, function() {});
-    //     });
-    // });
+    // if it exists,
+    if (data.storage.subs) {
+        // add each as a list element to the string
+        for (i = 0; i < data.storage.subs.length; i ++) {
+            subs += '<li class=""><span class="separator">-</span><a href="/v/'
+                + data.storage.subs[i] + '/">' + data.storage.subs[i] + '</a></li>';
+        }
+        // add subverse to list if not the homepage
+        if (window.location.pathname !== '/') {
+            if (data.storage.subs.indexOf(getSubverseName()) > -1)
+                $('button.btn-whoaverse-paging.btn-xs.btn-default').first()
+                    .after('<button class="btn-whoaverse-paging btn-xs btn-default vee-sub-mod">- sub list</button>');
+            else
+                $('button.btn-whoaverse-paging.btn-xs.btn-default').first()
+                    .after('<button class="btn-whoaverse-paging btn-xs btn-default vee-sub-mod">+ sub list</button>');
+        }
+    }
+    else {
+        // add subverse to list if not the homepage
+        if (window.location.pathname !== '/') {
+            $('button.btn-whoaverse-paging.btn-xs.btn-default').first()
+                .after('<button class="btn-whoaverse-paging btn-xs btn-default vee-sub-mod">+ sub list</button>');
+        }
+    }
+    // replace the top bar with the HTML build (or blank)
+    // so long as there are selected subs (otherwise show the default bar)
+    if (subs !== '')
+        $('ul#sr-bar').html(subs);
+    // handler for clicking the sublist mod button
+    $('button.vee-sub-mod').on('click', function() {
+        // if we're to add this to the list
+        if ($(this).text().lastIndexOf('+', 0) === 0) {
+            if (data.storage.subs) {
+                if (data.storage.subs.length === 0)
+                    $('ul#sr-bar').html('');
+                data.storage.subs.push(getSubverseName());
+                $('ul#sr-bar').append('<li class=""><span class="separator">-</span><a href="/v/'
+                    + getSubverseName() + '/">' + getSubverseName() + '</a></li>');
+                $(this).text('- sub list');
+            }
+            else {
+                data.storage.subs = [getSubverseName()];
+                $('ul#sr-bar').find('li').each(function(index) {
+                    if ($(this).find('a').first().text() == getSubverseName()) {
+                        $(this).remove();
+                        return false;
+                    }
+                });
+                $(this).text('+ sub list');
+            }
+        }
+        else {
+            data.storage.subs.splice(data.storage.subs.indexOf(getSubverseName()), 1);
+            $('ul#sr-bar').find('li').each(function(index) {
+                if ($(this).find('a').first().text() == getSubverseName()) {
+                    $(this).remove();
+                    return false;
+                }
+            });
+            $(this).text('+ sub list');
+        }
+    });
 });
 
 /*
@@ -118,34 +119,31 @@ $(document).ready(function() {
             if ($('a#vee-saved').text() == 'Saved Links & Comments') {
                 // start building the HTML
                 var saved = '<div id="vee-saved-items"><h1>Saved items</h1>';
-                // load the saved items from storage
-                // chrome.storage.local.get('saved', function(items) {
-                //     // if there is anything previously stored,
-                //     if (items !== null && items !== undefined && items['saved'] !== undefined && items['saved'].length > 0) {
-                //         // iterate through each of them and add them to the HTML being built
-                //         for (i = 0; i < items['saved'].length; i ++) {
-                //             saved += '<div class="submission link self">'
-                //                 + '<p class="parent"></p>'
-                //                 + '<p class="title">'
-                //                 + '<a class="title may-blank " href="' + items['saved'][i]['link'] + '" tabindex="1" title="'
-                //                 + items['saved'][i]['title'] + '">' + items['saved'][i]['title'] + '</a>'
-                //                 + '<span class="domain">(<a href="' + items['saved'][i]['place'] + '">' + items['saved'][i]['place'] + '</a>)</span>'
-                //                 + '</p><p class="tagline">' + items['saved'][i]['info'] + '</p><div class="child"></div>'
-                //                 + '<div class="clearleft"><!--IE6fix--></div>';
-                //         }
-                //     }
-                //     else {
-                //         // otherwise, there's nothing in storage
-                //         saved += '<div class="submission link self"><p class="parent"></p><span class="rank"></span><p class="title"><a class="title may-blank " tabindex="1" '
-                //             + 'title="nothing here">nothing here</a></p><p class="tagline"></p><div class="child"></div><div class="clearleft"><!--IE6fix--></div>';
-                //     }
-                //     // finish off the HTML
-                //     saved += '</div>';
-                //     // remove any previously-loaded HTML readout
-                //     $('div#vee-saved-items').remove();
-                //     // and insert out HTML into the page
-                //     $('div#container').append(saved);
-                // });
+                // if there is anything previously stored,
+                if (data.storage.saved) {
+                    // iterate through each of them and add them to the HTML being built
+                    for (i = 0; i < data.storage.saved.length; i ++) {
+                        saved += '<div class="submission link self">'
+                            + '<p class="parent"></p>'
+                            + '<p class="title">'
+                            + '<a class="title may-blank " href="' + data.storage.saved[i]['link'] + '" tabindex="1" title="'
+                            + data.storage.saved[i]['title'] + '">' + data.storage.saved[i]['title'] + '</a>'
+                            + '<span class="domain">(<a href="' + data.storage.saved[i]['place'] + '">' + data.storage.saved[i]['place'] + '</a>)</span>'
+                            + '</p><p class="tagline">' + data.storage.saved[i]['info'] + '</p><div class="child"></div>'
+                            + '<div class="clearleft"><!--IE6fix--></div>';
+                    }
+                }
+                else {
+                    // otherwise, there's nothing in storage
+                    saved += '<div class="submission link self"><p class="parent"></p><span class="rank"></span><p class="title"><a class="title may-blank " tabindex="1" '
+                        + 'title="nothing here">nothing here</a></p><p class="tagline"></p><div class="child"></div><div class="clearleft"><!--IE6fix--></div>';
+                }
+                // finish off the HTML
+                saved += '</div>';
+                // remove any previously-loaded HTML readout
+                $('div#vee-saved-items').remove();
+                // and insert out HTML into the page
+                $('div#container').append(saved);
                 // hide the main contents
                 $('div.sitetable').hide(100);
                 // and show out saved items HTML
@@ -166,20 +164,18 @@ $(document).ready(function() {
     // add save links to all link panels under submissions and comments
     $('ul.flat-list.buttons').append('<li><a class="vee-save" title="save with Vee">save</a></li>');
     // check to see if there are any previously-saved items
-    // chrome.storage.local.get('saved', function(items) {
-    //     // iterate through all of them, checking to see if they are on the currently-loaded page
-    //     if ('saved' in items) {
-    //         for (i = 0; i < items['saved'].length; i ++) {
-    //             $('a.vee-save').each(function() {
-    //                 // if this saved item is on the page,
-    //                 if ($(this).parent().parent().find('li').first().find('a').attr('href') == items['saved'][i]['link']) {
-    //                     // turn its save link text into 'unsave'
-    //                     $(this).text('unsave');
-    //                 }
-    //             });
-    //         }
-    //     }
-    // });
+    // iterate through all of them, checking to see if they are on the currently-loaded page
+    if (data.storage.saved) {
+        for (i = 0; i < data.storage.saved.length; i ++) {
+            $('a.vee-save').each(function() {
+                // if this saved item is on the page,
+                if ($(this).parent().parent().find('li').first().find('a').attr('href') == data.storage.saved[i]['link']) {
+                    // turn its save link text into 'unsave'
+                    $(this).text('unsave');
+                }
+            });
+        }
+    }
     // listener for a (un)save link being clicked
     $('.vee-save').on('click', function() {
         // store the jQuery object for when `this` is changed in the processing below
@@ -202,43 +198,31 @@ $(document).ready(function() {
                 [[now.getMonth() + 1, now.getDate(), now.getFullYear()].join("/") + ',', [now.getHours(),
                 now.getMinutes()].join(':'), now.getHours() >= 12 ? 'PM' : 'AM'].join(' ');
             // get the saved items from storage
-            // chrome.storage.local.get('saved', function(items) {
-            //     // if nothing has been saved before,
-            //     if (items == null || items == undefined || items['saved'] == undefined || items['saved'].length < 1) {
-            //         // start off the storage fresh
-            //         items = [{link: link, title: title, place: place, info: info}];
-            //         // insert into storage
-            //         chrome.storage.local.set({'saved': items}, function() {
-            //             // turn the link into a unsave link
-            //             $(linkObj).text('unsave');
-            //         });
-            //     }
-            //     else {
-            //         // otherwise, append this item to the previously-saved items
-            //         items['saved'].push({link: link, title: title, place: place, info: info});
-            //         // and store back into storage
-            //         chrome.storage.local.set({'saved': items['saved']}, function() {
-            //             // turn the link into a unsave link
-            //             $(linkObj).text('unsave');
-            //         });
-            //     }
-            // });
+            // if nothing has been saved before,
+            if (data.storage.saved) {
+                // start off the storage fresh
+                items = [{link: link, title: title, place: place, info: info}];
+                // turn the link into a unsave link
+                $(linkObj).text('unsave');
+            }
+            else {
+                // otherwise, append this item to the previously-saved items
+                data.storage.saved.push({link: link, title: title, place: place, info: info});
+                // turn the link into a unsave link
+                $(linkObj).text('unsave');
+            }
         }
         else {
             // unsave link
             // get the link from the surrounding div
             var link = $(this).parent().parent().find('li').first().find('a').attr('href');
             // get the saved items from storage
-            // chrome.storage.local.get('saved', function(items) {
-            //     // search for this one
-            //     for (i = 0; i < items['saved'].length; i ++) {
-            //         if (items['saved'][i]['link'] == link)
-            //             // and remove it from the array
-            //             items['saved'].splice(i, 1);
-            //     }
-            //     // save the items back into storage
-            //     chrome.storage.local.set({'saved': items['saved']}, function() {});
-            // });
+            // search for this one
+            for (i = 0; i < data.storage.saved.length; i ++) {
+                if (data.storage.saved[i]['link'] == link)
+                    // and remove it from the array
+                    data.storage.saved.splice(i, 1);
+            }
             // and turn the link back into a save link
             $(this).text('save');
         }
@@ -249,68 +233,59 @@ $(document).ready(function() {
 User tags
 */
 $(document).ready(function() {
-    // local memory storage of tags
-    var tags;
-    // get tags from storage
-    chrome.storage.local.get('tags', function(items) {
-        // set to local reference
-        tags = items;
-        // if there are tags from storage,
-        if (tags['tags'] !== undefined) {
-            // append the appropriate tags to author links currently on the page
-            $('a.author').each(function() {
-                // if this user has a tag,
-                if ($(this).text() in tags['tags'])
-                    // add it
-                    $(this).after('<span class="vee-user-tag">' + tags['tags'][$(this).text()] + '</span><img src="'
-                        + chrome.extension.getURL('tag_10.png') + '" class="vee-user-tag-tag">');
-                else
-                    // otherwise, just show the tag icon link
-                    $(this).after('<span class="vee-user-tag" style="display: none;"></span><img src="'
-                        + chrome.extension.getURL('tag_10.png') + '" class="vee-user-tag-tag">');
-            });
-        }
-        else {
-            // no tags - just show the tag icon link
-            $('a.author').each(function() {
+    // if there are tags from storage,
+    if (data.storage.saved !== undefined) {
+        // append the appropriate tags to author links currently on the page
+        $('a.author').each(function() {
+            // if this user has a tag,
+            if ($(this).text() in data.storage.saved)
+                // add it
+                $(this).after('<span class="vee-user-tag">' + data.storage.saved[$(this).text()] + '</span><img src="'
+                    + chrome.extension.getURL('tag_10.png') + '" class="vee-user-tag-tag">');
+            else
+                // otherwise, just show the tag icon link
                 $(this).after('<span class="vee-user-tag" style="display: none;"></span><img src="'
                     + chrome.extension.getURL('tag_10.png') + '" class="vee-user-tag-tag">');
-            });
-        }
-        // when the X button on the floating window is clicked,
-        $('a#vee-user-tag-edit-cancel').on('on', function() {
-            // delete the floating window
-            $('div.vee-user-tag-edit').remove();
         });
-        // when a tag icon is clicked,
-        $('img.vee-user-tag-tag').on('click', function() {
-            // popup an editing window
-            $(this).after('<div class="vee-user-tag-edit" style="left: '
-                + ($(this).position().left + 10) + 'px; top: ' + ($(this).position().top + 10) + 'px;">'
-                + '<span>' + $(this).prev().prev().text() + '</span>'
-                + '<h2>Tag for ' + $(this).prev().prev().text() + '</h2>'
-                + '<a onclick="$(this).parent().remove();">X</a>'
-                + '<input type="text" placeholder="tag"><br />'
-                + '<button id="vee-user-tag-edit-set">Set</button>'
-                + '</div>');
-            // when the save button is clicked,
-            $('button#vee-user-tag-edit-set').on('click', function() {
-                // if this is the first tag
-                if (!('tags' in tags)) {
-                    // make an entry in the dictionary
-                    tags = {};
-                    tags['tags'] = [];
-                }
-                // set the value
-                tags['tags'][$('div.vee-user-tag-edit').find('span').text()] = $('div.vee-user-tag-edit').find('input').val();
-                // store the new tag back into storage
-                // chrome.storage.local.set({'tags': tags['tags']}, function() {
-                //     $('div.vee-user-tag-edit').prev().prev().css('visibility', 'visible');
-                //     $('div.vee-user-tag-edit').prev().prev().text($('div.vee-user-tag-edit').find('input').val());
-                //     $('div.vee-user-tag-edit').prev().prev().show();
-                //     $('div.vee-user-tag-edit').remove();
-                // });
-            });
+    }
+    else {
+        // no tags - just show the tag icon link
+        $('a.author').each(function() {
+            $(this).after('<span class="vee-user-tag" style="display: none;"></span><img src="'
+                + chrome.extension.getURL('tag_10.png') + '" class="vee-user-tag-tag">');
+        });
+    }
+    // when the X button on the floating window is clicked,
+    $('a#vee-user-tag-edit-cancel').on('on', function() {
+        // delete the floating window
+        $('div.vee-user-tag-edit').remove();
+    });
+    // when a tag icon is clicked,
+    $('img.vee-user-tag-tag').on('click', function() {
+        // popup an editing window
+        $(this).after('<div class="vee-user-tag-edit" style="left: '
+            + ($(this).position().left + 10) + 'px; top: ' + ($(this).position().top + 10) + 'px;">'
+            + '<span>' + $(this).prev().prev().text() + '</span>'
+            + '<h2>Tag for ' + $(this).prev().prev().text() + '</h2>'
+            + '<a onclick="$(this).parent().remove();">X</a>'
+            + '<input type="text" placeholder="tag"><br />'
+            + '<button id="vee-user-tag-edit-set">Set</button>'
+            + '</div>');
+        // when the save button is clicked,
+        $('button#vee-user-tag-edit-set').on('click', function() {
+            // if this is the first tag
+            if (!('tags' in tags)) {
+                // make an entry in the dictionary
+                tags = {};
+                data.storage.saved = [];
+            }
+            // set the value
+            data.storage.saved[$('div.vee-user-tag-edit').find('span').text()] = $('div.vee-user-tag-edit').find('input').val();
+            // store the new tag back into storage
+            $('div.vee-user-tag-edit').prev().prev().css('visibility', 'visible');
+            $('div.vee-user-tag-edit').prev().prev().text($('div.vee-user-tag-edit').find('input').val());
+            $('div.vee-user-tag-edit').prev().prev().show();
+            $('div.vee-user-tag-edit').remove();
         });
     });
 });
@@ -331,43 +306,40 @@ $(document).ready(function() {
             if ($('a#vee-hidden').text() == 'Hidden submissions') {
                 // start building the HTML
                 var hidden = '<div id="vee-hidden-items"><h1>Hidden submission</h1>';
-                // load the hidden items from storage
-                // chrome.storage.local.get('hidden', function(items) {
-                //     // if there is anything previously stored,
-                //     if (items !== null && items !== undefined && items['hidden'] !== undefined && items['hidden'].length > 0) {
-                //         // iterate through each of them and add them to the HTML being built
-                //         for (i = 0; i < items['hidden'].length; i ++) {
-                //             // get the subverse from the Voat API
-                //             $.ajax({
-                //                 url: 'https://voat.co/api/singlesubmission?id=' + items['hidden'][i],
-                //                 dataType: 'json',
-                //                 success: function(data) {
-                //                     hidden += '<div class="submission link self">'
-                //                         + '<p class="parent"></p>'
-                //                         + '<p class="title">'
-                //                         + '<a class="title may-blank " href="/v/' + data['Subverse'] + '/comments/' + items['hidden'][i] + '" tabindex="1" title="'
-                //                         + data['Title'] + '">' + data['Title'] + '</a>'
-                //                         + '<span class="domain">(<a href="/v/' + data['Subverse'] + '/comments/' + items['hidden'][i] + '">' + data['Subverse'] + '</a>)</span>'
-                //                         + '</p><p class="tagline"></p><div class="child"></div>'
-                //                         + '<div class="clearleft"><!--IE6fix--></div>';
-                //                 },
-                //                 // make the Ajax calls synchronous
-                //                 async: false
-                //             });
-                //         }
-                //     }
-                //     else {
-                //         // otherwise, there's nothing in storage
-                //         hidden += '<div class="submission link self"><p class="parent"></p><span class="rank"></span><p class="title"><a class="title may-blank " tabindex="1" '
-                //             + 'title="nothing here">nothing here</a></p><p class="tagline"></p><div class="child"></div><div class="clearleft"><!--IE6fix--></div>';
-                //     }
-                //     // finish off the HTML
-                //     hidden += '</div>';
-                //     // remove any previously-loaded HTML readout
-                //     $('div#vee-hidden-items').remove();
-                //     // and insert out HTML into the page
-                //     $('div#container').append(hidden);
-                // });
+                // if there is anything previously stored,
+                if (data.storage.hidden) {
+                    // iterate through each of them and add them to the HTML being built
+                    for (i = 0; i < data.storage.hidden.length; i ++) {
+                        // get the subverse from the Voat API
+                        $.ajax({
+                            url: 'https://voat.co/api/singlesubmission?id=' + data.storage.hidden[i],
+                            dataType: 'json',
+                            success: function(data) {
+                                hidden += '<div class="submission link self">'
+                                    + '<p class="parent"></p>'
+                                    + '<p class="title">'
+                                    + '<a class="title may-blank " href="/v/' + data['Subverse'] + '/comments/' + data.storage.hidden[i] + '" tabindex="1" title="'
+                                    + data['Title'] + '">' + data['Title'] + '</a>'
+                                    + '<span class="domain">(<a href="/v/' + data['Subverse'] + '/comments/' + data.storage.hidden[i] + '">' + data['Subverse'] + '</a>)</span>'
+                                    + '</p><p class="tagline"></p><div class="child"></div>'
+                                    + '<div class="clearleft"><!--IE6fix--></div>';
+                            },
+                            // make the Ajax calls synchronous
+                            async: false
+                        });
+                    }
+                }
+                else {
+                    // otherwise, there's nothing in storage
+                    hidden += '<div class="submission link self"><p class="parent"></p><span class="rank"></span><p class="title"><a class="title may-blank " tabindex="1" '
+                        + 'title="nothing here">nothing here</a></p><p class="tagline"></p><div class="child"></div><div class="clearleft"><!--IE6fix--></div>';
+                }
+                // finish off the HTML
+                hidden += '</div>';
+                // remove any previously-loaded HTML readout
+                $('div#vee-hidden-items').remove();
+                // and insert out HTML into the page
+                $('div#container').append(hidden);
                 // hide the main contents
                 $('div.sitetable').hide(100);
                 // and show out hidden items HTML
@@ -391,34 +363,32 @@ $(document).ready(function() {
     else
         $('ul.flat-list.buttons').append('<li><a class="vee-hide" title="hide with Vee">hide</a></li>');
     // check to see if there are any previously-hidden items
-    // chrome.storage.local.get('hidden', function(items) {
-    //     if (items !== null && items !== undefined && items['hidden'] !== undefined && items['hidden'].length > 0) {
-    //         // iterate through all of them, checking to see if they are on the currently-loaded page
-    //         // if this is a comments page
-    //         var commentsPage = window.location.pathname.indexOf('/comments/') > -1;
-    //         for (i = 0; i < items['hidden'].length; i ++) {
-    //             $('a.vee-hide').each(function() {
-    //                 // submission id
-    //                 var submissionId;
-    //                 if (commentsPage)
-    //                     submissionId = $(this).parent().parent().parent().parent().attr('id').split('-')[1];
-    //                 else
-    //                     submissionId = $(this).parent().parent().parent().parent().attr('data-fullname');
-    //                 // if this hidden item is on the page,
-    //                 if (submissionId == items['hidden'][i]) {
-    //                     if (commentsPage) {
-    //                         // show unhide link
-    //                         $('a.vee-hide').text('unhide');
-    //                     }
-    //                     else {
-    //                         // hide the div
-    //                         $(this).parent().parent().parent().parent().first().hide(100);
-    //                     }
-    //                 }
-    //             });
-    //         }
-    //     }
-    // });
+    if (items !== null && items !== undefined && data.storage.hidden !== undefined && data.storage.hidden.length > 0) {
+        // iterate through all of them, checking to see if they are on the currently-loaded page
+        // if this is a comments page
+        var commentsPage = window.location.pathname.indexOf('/comments/') > -1;
+        for (i = 0; i < data.storage.hidden.length; i ++) {
+            $('a.vee-hide').each(function() {
+                // submission id
+                var submissionId;
+                if (commentsPage)
+                    submissionId = $(this).parent().parent().parent().parent().attr('id').split('-')[1];
+                else
+                    submissionId = $(this).parent().parent().parent().parent().attr('data-fullname');
+                // if this hidden item is on the page,
+                if (submissionId == data.storage.hidden[i]) {
+                    if (commentsPage) {
+                        // show unhide link
+                        $('a.vee-hide').text('unhide');
+                    }
+                    else {
+                        // hide the div
+                        $(this).parent().parent().parent().parent().first().hide(100);
+                    }
+                }
+            });
+        }
+    }
     // listener for hide links
     $('a.vee-hide').on('click', function() {
         // get the id of the surrounding div
@@ -433,35 +403,29 @@ $(document).ready(function() {
             submissionId = linkObj.parent().parent().parent().parent().attr('id').split('-')[1];
         else
             submissionId = linkObj.parent().parent().parent().parent().attr('data-fullname');
-        // get all hidden ids from storage
-        // chrome.storage.local.get('hidden', function(items) {
-        //     // if there are other entries in storage
-        //     if (!(items == null || items == undefined || items['hidden'] == undefined || items['hidden'].length < 1)) {
-        //         if (doHide) {
-        //             // if there are other entries and we're hiding this item,
-        //             // add it to the list
-        //             items['hidden'].push(submissionId);
-        //         }
-        //         else if(commentsPage) {
-        //             // if we're unhiding this item,
-        //             // remove it from the list
-        //             items['hidden'].splice(items['hidden'].indexOf(submissionId), 1);
-        //         }
-        //     }
-        //     else if (doHide) {
-        //         // set the item as the list
-        //         items['hidden'] = [submissionId];
-        //     }
-        //     // set the text
-        //     linkObj.text(doHide ? 'unhide' : 'hide');
-        //     // store in storage
-        //     chrome.storage.local.set({'hidden': items['hidden']}, function() {
-        //         // on success, if this isn't a comments page,
-        //         if (!commentsPage)
-        //             // hide the submission
-        //             linkObj.parent().parent().parent().parent().first().hide(100);
-        //     });
-        // });
+        // if there are other entries in storage
+        if (!(items == null || items == undefined || data.storage.hidden == undefined || data.storage.hidden.length < 1)) {
+            if (doHide) {
+                // if there are other entries and we're hiding this item,
+                // add it to the list
+                data.storage.hidden.push(submissionId);
+            }
+            else if(commentsPage) {
+                // if we're unhiding this item,
+                // remove it from the list
+                data.storage.hidden.splice(data.storage.hidden.indexOf(submissionId), 1);
+            }
+        }
+        else if (doHide) {
+            // set the item as the list
+            data.storage.hidden = [submissionId];
+        }
+        // set the text
+        linkObj.text(doHide ? 'unhide' : 'hide');
+        // on success, if this isn't a comments page,
+        if (!commentsPage)
+            // hide the submission
+            linkObj.parent().parent().parent().parent().first().hide(100);
     });
 });
 
