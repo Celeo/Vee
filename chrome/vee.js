@@ -482,7 +482,7 @@ $(document).keypress(function(e) {
             // get all matching links
             getDivs(true).each(function() {
                 // and click them
-                $(this).find('.link-expando-type').click();
+                $(this).find('.expando-button').click();
             });
             break;
     }
