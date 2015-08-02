@@ -168,7 +168,7 @@ $(document).ready(function() {
     // if the user is on the main page, add a button to show all hidden links
     if (window.location.pathname == '/') {
         // add the button to show the saved items to the sidebar
-        $('div.side>div.spacer').eq(8)
+        $('div.side>div.spacer').eq(6)
             .after('<div class="spacer"><a id="vee-hidden"'
             + 'class="btn-whoaverse btn-block contribute">Hidden submissions</a></div>');
         // listener for that button being clicked
