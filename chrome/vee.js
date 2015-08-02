@@ -188,12 +188,16 @@ $(document).ready(function() {
                                 url: 'https://voat.co/api/singlesubmission?id=' + items['hidden'][i],
                                 dataType: 'json',
                                 success: function(data) {
+                                    var subverse = data['Subverse']
+                                    var title = data['Title'];
+                                    if (title == null || title == undefined || title == 'null')
+                                        title = data['Linkdescription']
                                     hidden += '<div class="submission link self">'
                                         + '<p class="parent"></p>'
                                         + '<p class="title">'
-                                        + '<a class="title may-blank " href="/v/' + data['Subverse'] + '/comments/' + items['hidden'][i] + '" tabindex="1" title="'
-                                        + data['Title'] + '">' + data['Title'] + '</a>'
-                                        + '<span class="domain">(<a href="/v/' + data['Subverse'] + '/comments/' + items['hidden'][i] + '">' + data['Subverse'] + '</a>)</span>'
+                                        + '<a class="title may-blank " href="/v/' + subverse + '/comments/' + items['hidden'][i] + '" tabindex="1" title="'
+                                        + title + '">' + title + '</a>'
+                                        + '<span class="domain">(<a href="/v/' + subverse + '/comments/' + items['hidden'][i] + '">' + subverse + '</a>)</span>'
                                         + '</p><p class="tagline"></p><div class="child"></div>'
                                         + '<div class="clearleft"><!--IE6fix--></div>';
                                 },
