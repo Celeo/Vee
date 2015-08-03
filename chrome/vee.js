@@ -215,7 +215,7 @@ $(document).ready(function() {
                     hidden += '</div>';
                     // remove any previously-loaded HTML readout
                     $('div#vee-hidden-items').remove();
-                    // and insert out HTML into the page
+                    // and insert HTML into the page
                     $('div#container').append(hidden);
                 });
                 // hide the main contents
@@ -408,15 +408,6 @@ $(document).keypress(function(e) {
                     // break from the each
                     return false;
                 }
-            });
-            break;
-        case 115:
-            // s - save
-            getDivs(true).each(function() {
-                // click the (un)save link
-                $(this).find('a.vee-save').first().click();
-                // break from the each
-                return false;
             });
             break;
         case 99:
