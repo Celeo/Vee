@@ -2,7 +2,7 @@
 
 A simple, RES-inspired Chrome extension for making Voat more user-friendly.
 
-## Shortcuts
+## Shortcuts (default) settings
 
 * q - navigate up
 * a - navigate down
