@@ -1,3 +1,33 @@
+// key <-> keycode map for custom keybindings
+keyMapping = {
+    'a': 97,
+    'b': 98,
+    'c': 99,
+    'd': 100,
+    'e': 101,
+    'f': 102,
+    'g': 103,
+    'h': 104,
+    'i': 105,
+    'j': 106,
+    'k': 107,
+    'l': 108,
+    'm': 109,
+    'o': 111,
+    'n': 110,
+    'p': 112,
+    'q': 113,
+    'r': 114,
+    's': 115,
+    't': 116,
+    'u': 117,
+    'v': 118,
+    'w': 119,
+    'x': 120,
+    'y': 121,
+    'z': 122
+};
+
 /*
 Returns the div elements to iterate through, based on the 
 current window's URL and the bool parameter.
@@ -27,6 +57,13 @@ Returns the name of the subverse
 */
 function getSubverseName() {
     return $('a.subverse').first().text();
+}
+
+/*
+Returns true if the string is a letter, a through z
+*/
+function isAlpha(s) {
+  return s.length === 1 && s.match(/[a-z]/i);
 }
 
 /*
@@ -175,6 +212,8 @@ $(document).ready(function() {
         $('#vee-hidden').on('click', function() {
             // if the button's text is to show the saved items,
             if ($('a#vee-hidden').text() == 'Hidden submissions') {
+                // hide the options button
+                $('#vee-settings').hide();
                 // start building the HTML
                 var hidden = '<div id="vee-hidden-items"><h1>Hidden submission</h1>';
                 // load the hidden items from storage
@@ -226,6 +265,8 @@ $(document).ready(function() {
                 $('a#vee-hidden').text('Show main content');
             }
             else {
+                // show the options button
+                $('#vee-settings').show();
                 // hide out saved items readout
                 $('div#vee-hidden-items').hide();
                 // and bring back the main content
@@ -316,6 +357,150 @@ $(document).ready(function() {
 });
 
 /*
+Vee customization
+*/
+$(document).ready(function() {
+    // global options
+    options = {};
+    // if there are other entries in storage
+    chrome.storage.local.get('options', function(items) {
+        if (items !== null && items !== undefined && items['options'] !== undefined) {
+            options = items['options'];
+        }
+        else {
+            // create new options
+            options = {
+                'keybinds': {
+                    'nav-up': 'q',
+                    'nav-down': 'a',
+                    'open-link': 'w',
+                    'open-comments': 'c',
+                    'open-both': 'r',
+                    'vote-up': 'e',
+                    'vote-down': 'd',
+                    'expand': 'z'
+                }
+            };
+            chrome.storage.local.set({'options': options}, function() {
+            });
+        }
+        // if the user is on the main page, add a button to control settings
+        if (window.location.pathname == '/') {
+            // add the button to show the options to the sidebar
+            $('div.side>div.spacer').eq(7)
+                .after('<div class="spacer"><a id="vee-settings"'
+                + 'class="btn-whoaverse btn-block contribute">Vee options</a></div>');
+            // listener for that button being clicked
+            $('#vee-settings').on('click', function() {
+                // clear feedback td
+                $('#vee-options-feedback').html('');
+                // if the button's text is to show the saved items,
+                if ($('a#vee-settings').text() == 'Vee options') {
+                    // hide the hidden links button
+                    $('#vee-hidden').hide();
+                    // construct HTML
+                    var optionsHTML = '<div id="vee-settings-items"><h1>Vee options</h1>' + 
+                        '<h2>Keybindings</h2>' +
+                        '<table class="vee-options">' +
+                            '<tr>' +
+                                '<th>Action</th>' +
+                                '<th>Key</th>' +
+                            '</tr>' +
+                            '<tr>' +
+                                '<td>Navigate up</td>' +
+                                '<td>' + '<input type="text" id="vee-options-nav-up" value="' + options['keybinds']['nav-up'] + '">' + '</td>' +
+                            '</tr>' +
+                            '<tr>' +
+                                '<td>Navigate down</td>' +
+                                '<td>' + '<input type="text" id="vee-options-nav-down" value="' + options['keybinds']['nav-down'] + '">' + '</td>' +
+                            '</tr>' +
+                            '<tr>' +
+                                '<td>Open link</td>' +
+                                '<td>' + '<input type="text" id="vee-options-open-link" value="' + options['keybinds']['open-link'] + '">' + '</td>' +
+                            '</tr>' +
+                            '<tr>' +
+                                '<td>Open comments page</td>' +
+                                '<td>' + '<input type="text" id="vee-options-open-comments" value="' + options['keybinds']['open-comments'] + '">' + '</td>' +
+                            '</tr>' +
+                            '<tr>' +
+                                '<td>Open link and comments page</td>' +
+                                '<td>' + '<input type="text" id="vee-options-open-both" value="' + options['keybinds']['open-both'] + '">' + '</td>' +
+                            '</tr>' +
+                            '<tr>' +
+                                '<td>Vote up</td>' +
+                                '<td>' + '<input type="text" id="vee-options-vote-up" value="' + options['keybinds']['vote-up'] + '">' + '</td>' +
+                            '</tr>' +
+                            '<tr>' +
+                                '<td>Vote down</td>' +
+                                '<td>' + '<input type="text" id="vee-options-vote-down" value="' + options['keybinds']['vote-down'] + '">' + '</td>' +
+                            '</tr>' +
+                            '<tr>' +
+                                '<td>Expand contents</td>' +
+                                '<td>' + '<input type="text" id="vee-options-expand" value="' + options['keybinds']['expand'] + '">' + '</td>' +
+                            '</tr>' +
+                            '<tr>' +
+                                '<td id="vee-options-feedback"></td>' +
+                                '<td><button id="vee-options-save" class="btn-whoaverse btn-block contribute">Save</button></td>' +
+                        '</table></div>';
+                    // remove any previously-loaded HTML readout
+                    $('div#vee-settings-items').remove();
+                    // and insert HTML into the page
+                    $('div#container').append(optionsHTML);
+                    $('button#vee-options-save').on('click', function() {
+                        var newOptions = {
+                            'keybinds': {
+                                'nav-up': $('#vee-options-nav-up').val(),
+                                'nav-down': $('#vee-options-nav-down').val(),
+                                'open-link': $('#vee-options-open-link').val(),
+                                'open-comments': $('#vee-options-open-comments').val(),
+                                'open-both': $('#vee-options-open-both').val(),
+                                'vote-up': $('#vee-options-vote-up').val(),
+                                'vote-down': $('#vee-options-vote-down').val(),
+                                'expand': $('#vee-options-expand').val()
+                            }
+                        };
+                        // quick check for verification that all keybinds are a-z
+                        if (isAlpha(newOptions['keybinds']['nav-up']) &&
+                                isAlpha(newOptions['keybinds']['nav-down']) &&
+                                isAlpha(newOptions['keybinds']['open-link']) &&
+                                isAlpha(newOptions['keybinds']['open-comments']) &&
+                                isAlpha(newOptions['keybinds']['open-both']) &&
+                                isAlpha(newOptions['keybinds']['vote-up']) &&
+                                isAlpha(newOptions['keybinds']['vote-down']) &&
+                                isAlpha(newOptions['keybinds']['expand'])) {
+                            options = newOptions;
+                            // save new options
+                            chrome.storage.local.set({'options': options}, function() {
+                                $('#vee-options-feedback').html('<p>Saved!</p>');
+                            });
+                        }
+                        else {
+                            alert('Keybinds must be within a through z');
+                        }
+                    });
+                    // hide the main contents
+                    $('div.sitetable').hide(100);
+                    // and show out hidden items HTML
+                    $('div#vee-settings-items').show();
+                    // switch the button text so we know to reverse this process next time
+                    $('a#vee-settings').text('Show main content');
+                }
+                else {
+                    // show the hidden links button
+                    $('#vee-hidden').show();
+                    // hide out saved items readout
+                    $('div#vee-settings-items').hide();
+                    // and bring back the main content
+                    $('div.sitetable').show(100);
+                    // and switch the button text back
+                    $('a#vee-settings').text('Vee options');
+                }
+            });
+        }
+    });
+});
+
+/*
 Handle navigating submissions by clicking
 */
 $('div.submission').on('click', function() {
@@ -353,7 +538,7 @@ $(document).keypress(function(e) {
         // don't activate hotkeys when the user is typing
         return;
     switch (e.keyCode) {
-        case 113:
+        case keyMapping[options['keybinds']['nav-up']]:
             // q - move up
             var found = false;
             // for each possible div,
@@ -377,7 +562,7 @@ $(document).keypress(function(e) {
             if (!found)
                 getDivs().eq(window.location.pathname == '/' ? 1 : 0).addClass('vee-highlighted');
             break;
-        case 97:
+        case keyMapping[options['keybinds']['nav-down']]:
             // a - move down
             var found = false;
             // for each possible div,
@@ -398,7 +583,7 @@ $(document).keypress(function(e) {
             if (!found)
                 getDivs().eq(window.location.pathname == '/' ? 1 : 0).addClass('vee-highlighted');
             break;
-        case 119:
+        case keyMapping[options['keybinds']['open-link']]:
             // w - open link
             getDivs(true).each(function() {
                 // if there's a title link,
@@ -410,7 +595,7 @@ $(document).keypress(function(e) {
                 }
             });
             break;
-        case 99:
+        case keyMapping[options['keybinds']['open-comments']]:
             // c - open comments
             getDivs(true).each(function() {
                 // if there's a comments link,
@@ -422,7 +607,7 @@ $(document).keypress(function(e) {
                 }
             });
             break;
-        case 114:
+        case keyMapping[options['keybinds']['open-both']]:
             // r - open link and comments
             getDivs(true).each(function(index) {
                 // if there's a title link,
@@ -442,7 +627,7 @@ $(document).keypress(function(e) {
                 return false;
             });
             break;
-        case 101:
+        case keyMapping[options['keybinds']['vote-up']]:
             // e - vote up
             getDivs(true).each(function() {
                 // search for the up arrow
@@ -457,7 +642,7 @@ $(document).keypress(function(e) {
                 return false;
             });
             break;
-        case 100:
+        case keyMapping[options['keybinds']['vote-down']]:
             // d - vote down
             getDivs(true).each(function() {
                 // search for the down arrow
@@ -472,9 +657,8 @@ $(document).keypress(function(e) {
                 return false;
             });
             break;
-        case 122:
+        case keyMapping[options['keybinds']['expand']]:
             // z - expand/contract images/videos
-            // get all matching links
             getDivs(true).each(function() {
                 // and click them
                 $(this).find('.expando-button').click();

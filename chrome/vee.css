@@ -55,3 +55,38 @@ div.vee-user-tag-edit a {
     padding: 2px;
     border: 1px solid gray;
 }
+
+table.vee-options {
+    border-collapse: collapse;
+}
+
+table.vee-options th, table.vee-options td {
+    border: 1px solid gray;
+    padding: 3px;
+}
+
+table.vee-options th {
+    font-weight: bold;
+}
+
+table.vee-options input {
+    padding: 0 5px 0 5px;
+}
+
+div#vee-settings-items {
+    font-size: 2em;
+}
+
+div#vee-settings-items h1 {
+    font-size: 2em;
+    text-align: center;
+}
+
+div#vee-settings-items h2 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+td#vee-options-feedback {
+    text-align: right;
+}
